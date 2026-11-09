@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   dmg:
-    runs-on: macos-14   # Apple Silicon (arm64)
+    runs-on: macos-15   # Apple Silicon (arm64); macos-14 runners were retired by GitHub on 2026-11-02
     timeout-minutes: 90
     steps:
       - name: Free disk space and check that at least 10 GB are available

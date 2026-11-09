@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   test:
-    runs-on: macos-14   # Apple Silicon (arm64)
+    runs-on: macos-15   # Apple Silicon (arm64); macos-14 runners were retired by GitHub on 2026-11-02
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
