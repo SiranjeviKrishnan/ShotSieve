@@ -218,7 +218,13 @@ done < <(find "$APP" -type f \( -name '*.so' -o -name '*.dylib' -o -perm -u+x \)
 # (b) text and binary files naming this machine
 # (wheels built on CI runners legitimately carry their own /Users/runner/... strings: only THIS
 # machine's user, repo and temp folders count)
-PATTERN="/Users/$(id -un)|$ROOT|$WORK|${WORK#/private}|shotsieve-release\\.|$HOME"
+PATTERN="$ROOT|$WORK|${WORK#/private}|shotsieve-release\\."
+# The build user's home only counts on a personal machine. On a CI runner (GitHub Actions sets
+# CI=true and the user is "runner") every third-party wheel already contains /Users/runner/...
+# from its own build, so that generic home would flag the whole bundle.
+if [ "${CI:-}" != "true" ] || [ "$(id -un)" != "runner" ]; then
+  PATTERN="$PATTERN|/Users/$(id -un)|$HOME"
+fi
 HITS="$(grep -rIlE "$PATTERN" "$APP" 2>/dev/null || true)"
 if [ -n "$HITS" ]; then echo "$HITS" | sed 's/^/   path in text: /'; BAD=1; fi
 HITS="$(grep -rlaE "$PATTERN" "$APP" --include='*.so' --include='*.dylib' --include='python3.11' --include='ShotSieve' --include='*.pyc' 2>/dev/null || true)"
