@@ -1,0 +1,18 @@
+# Sports shot list. "!" = must-have, "xN" = at least N frames, person:"Name" = that person only.
+!the starting line-up
+!a goal being scored
+!a player shooting at goal
+a goalkeeper making a save
+a player dribbling past a defender
+a tackle
+!a goal celebration
+a header in the air
+players on the sideline or bench
+the coach giving instructions
+the crowd cheering in the stands
+a corner kick
+!the trophy or medal ceremony
+a team huddle
+!a referee making a call
+the final whistle and handshakes
+substitute coming onto the pitch

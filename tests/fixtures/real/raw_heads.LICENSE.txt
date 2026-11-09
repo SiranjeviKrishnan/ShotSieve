@@ -1,0 +1,22 @@
+Provenance and licence of the two RAW heads in this folder (L7 of the T24 release review).
+
+canon_5dm3.head.cr2: the first 262144 bytes (256 KB) of
+  https://raw.pixls.us/getfile.php/773/nice/Canon%20-%20EOS%205D%20Mark%20III%20-%20sRAW2%20(sRAW).CR2
+  (Canon EOS 5D Mark III, sRAW2; raw.pixls.us repository listing: uploaded 2017-01-05)
+  sha256 of the FULL source file: a79065e78a6c5bdbc8726e786ade02d54a7d496cc3cb4504d804c924a3d999da
+  sha256 of the 256 KB head as stored: dc5356eec5118e1f69fee4a8a59739f00a323601cf637255adad237dda100a7a
+
+sony_a7m3.head.arw: the first 262144 bytes (256 KB) of
+  https://raw.pixls.us/getfile.php/2414/nice/Sony%20-%20ILCE-7M3%20-%2014bit%2014bit%20compressed%20(3:2).ARW
+  (Sony ILCE-7M3 (A7 III), 14-bit compressed; uploaded 2018-03-14)
+  sha256 of the FULL source file: 250784580ea527442c09004417bb0eead484f2bf3ee8f9121a776ac65bb50d0f
+  sha256 of the 256 KB head as stored: 2847f89ba351d258070b29b838952a3797b4abe3eb354134ed6a4008b8f465da
+
+Licence: CC0 1.0 / public domain. raw.pixls.us accepts only samples whose uploader releases them
+under CC0, and its per-sample licence column in the repository listing
+(https://raw.pixls.us/json/getrepository.php?set=all, checked 2026-11-09) shows "Creative Commons 0 -
+Public Domain" for both files above. The source of each head was re-established on 2026-11-09 by
+downloading the candidate samples of these two camera models and comparing the first 256 KB byte for
+byte with the stored heads. The serial numbers and the artist tag in their EXIF belong to the
+uploaders, not to the ShotSieve authors. The files are data only; they are parsed by
+tests/test_makernotes.py, never executed.

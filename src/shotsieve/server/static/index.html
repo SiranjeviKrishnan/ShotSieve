@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>ShotSieve</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/filters.css">
+  <link rel="stylesheet" href="/static/select.css">
+</head>
+<body>
+  <div id="drop-overlay" hidden aria-live="polite"><div>Drop a folder or photos to cull</div></div>
+  <header id="topbar">
+    <div class="tb-row tb-main">
+      <span class="brand">ShotSieve</span>
+      <input id="folder" class="browser-only" type="text" spellcheck="false" placeholder="/absolute/path/to/shoot" aria-label="Folder">
+      <span id="folder-pick" class="native-only">
+        <button id="btn-choose" title="Choose a folder in Finder (Cmd+O)">Choose Folder…</button>
+        <span id="folder-chip" hidden></span>
+        <span class="menu-wrap"><button id="btn-recent" aria-haspopup="menu" aria-expanded="false" title="Recent folders">Recent ▾</button>
+          <div id="recent-menu" role="menu" hidden></div></span>
+      </span>
+      <button id="btn-cull" class="primary" title="Cull this folder">Cull</button>
+      <div id="progress" hidden>
+        <div class="bar"><div id="progress-fill"></div></div>
+        <span id="progress-text"></span>
+      </div>
+      <input id="search" type="search" spellcheck="false" placeholder='Search: "bride laughing"  (/)' aria-label="Search">
+      <span id="index-pill" class="pill" hidden></span>
+      <span class="spacer"></span>
+    </div>
+    <div class="tb-row tb-tools">
+      <span class="spacer"></span>
+      <span class="menu-wrap browser-only"><button id="btn-hamburger" aria-haspopup="menu" aria-expanded="false" title="Menu" aria-label="Menu">☰</button>
+        <div id="hamburger-menu" class="menu" role="menu" hidden></div></span>
+      <button id="btn-help" title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts">?</button>
+    </div>
+  </header>
+
+  <!-- T23g: the actions that used to sit in the top-right live in the native menu bar (Mac app) or the
+       hamburger menu (browser). The elements stay here, hidden, so every handler is the existing one. -->
+  <div id="menu-actions" hidden aria-hidden="true">
+      <input id="chk-crops" type="checkbox" checked><input id="chk-video" type="checkbox" checked>
+      <button id="btn-audit-done" hidden title="Finish the audit and recalibrate">Finish audit</button>
+      <button id="btn-cameras" title="Align the clocks of several camera bodies">Cameras</button>
+      <button id="btn-people" title="Every recognised person (Shift+P)">People <kbd>⇧P</kbd></button>
+      <button id="btn-shotlist" title="Check your shot list against the cull">Shot list</button>
+      <button id="btn-edit" title="Learn your editing style and predict develop settings">Edit profile</button>
+      <span class="menu-wrap"><button id="btn-view" aria-haspopup="menu" aria-expanded="false" title="View options">View ▾</button>
+        <div id="view-menu" class="menu" role="menu" hidden>
+          <button id="mi-subject" role="menuitemcheckbox" aria-checked="false" title="Draw a box around your subject (S)">Subject mode <kbd>S</kbd></button>
+          <button id="mi-chips" role="menuitemcheckbox" aria-checked="false" title="Small name chips on the grid cells">Name chips on grid cells</button>
+        </div></span>
+      <span class="menu-wrap"><button id="btn-more" aria-haspopup="menu" aria-expanded="false" title="More tools">More ▾</button>
+        <div id="more-menu" class="menu" role="menu" hidden>
+          <button id="mi-lr" role="menuitem" hidden title="Read your picks, stars and labels from a Lightroom Classic catalog (read-only)">Sync with Lightroom Classic catalog…</button>
+          <button id="mi-jersey" role="menuitem" hidden title="Read jersey numbers, load a roster, write number tags">Jersey numbers…</button>
+          <div id="more-none" class="none">Nothing else here yet</div>
+        </div></span>
+  </div>
+
+  <div id="shotlist-banner" role="alert" hidden></div>
+  <div id="people-strip" hidden></div>
+  <div id="filterbar" role="toolbar" aria-label="Filters" hidden></div>
+
+  <div id="main">
+    <nav id="tabs" aria-label="Filter">
+      <button data-filter="all" class="tab active">All <span class="count" id="c-all">0</span></button>
+      <button data-filter="keep" class="tab keep">Keep <span class="count" id="c-keep">0</span></button>
+      <button data-filter="review" class="tab review">Review <span class="count" id="c-review">0</span></button>
+      <button data-filter="reject" class="tab reject">Reject <span class="count" id="c-reject">0</span></button>
+      <button data-filter="audit" class="tab audit">Audit <span class="count" id="c-audit">0</span></button>
+      <button id="tab-needs-edit" data-filter="needs_edit" class="tab edit" hidden>Needs your edit <span class="count" id="c-needs-edit">0</span></button>
+      <button id="btn-collapse" class="tab ghost" title="Collapse / expand groups (G)">Groups: expanded</button>
+    </nav>
+
+    <section id="grid" tabindex="-1"><div id="spacer"></div><div id="empty" hidden></div></section>
+
+    <aside id="detail">
+      <div id="loupe-wrap"><img id="loupe" alt=""><div id="loupe-crop" class="loupe-crop" hidden><div class="cropwrap"><img alt=""></div></div><div id="loupe-empty">Select an image</div></div>
+      <div id="dn-main" class="dnrow" hidden><button type="button" id="btn-dn-main" aria-pressed="false" title="Denoise the preview (D). Your files are never changed."><span class="dn-text">Denoise</span><i class="dn-badge">Off</i><i class="dn-spin" hidden></i><kbd>D</kbd></button></div>
+      <div id="info" hidden>
+        <h2 id="d-name"></h2>
+        <div class="verdict"><span id="d-decision" class="pill"></span><span id="d-audit" class="pill audit" hidden>Audit</span><span id="d-rating"></span></div>
+        <div class="scorebar"><div id="d-score-fill"></div><span id="d-score"></span></div>
+        <div id="d-chips" class="reason-chips" aria-label="Reasons"></div>
+        <div id="d-faces" class="faces-row" hidden><h3>Faces</h3><div id="d-faces-list"></div></div>
+        <h3>Why</h3>
+        <ul id="d-reasons"></ul>
+        <div id="d-edit" class="editbox" hidden></div>
+        <p id="d-jersey" class="note" hidden></p>
+        <p id="d-note" class="note" hidden></p>
+        <div class="actionbar">
+        <div class="actions">
+          <button data-act="keep" class="keep" aria-pressed="false" title="Keep (P). Click again to go back to ShotSieve's decision">Keep <kbd>P</kbd></button>
+          <button data-act="reject" class="reject" aria-pressed="false" title="Reject (X). Click again to go back to ShotSieve's decision">Reject <kbd>X</kbd></button>
+        </div>
+        <div class="actions actions-2"><button id="btn-crop" title="Crop with AI suggestions (R)">Crop <kbd>R</kbd></button><button id="btn-cmp-detail" title="Compare with the best near-identical frame, or compare the selected photos (C)">Compare <kbd>C</kbd></button><button id="btn-lrop" class="lr-open" hidden title="Open in Lightroom (Cmd+L)">Lightroom <kbd>⌘L</kbd></button></div>
+        </div>
+      </div>
+      <div id="multi-info" hidden aria-live="polite"></div>
+    </aside>
+  </div>
+
+  <footer id="statusbar" aria-label="Shortcuts">
+    <span id="sb-info"></span><button id="sb-xmp" class="linklike" hidden title="Click for details"></button><span class="spacer"></span>
+    <span class="sb-keys"><kbd>←</kbd><kbd>→</kbd> move <kbd>P</kbd> keep <kbd>X</kbd> reject <kbd>Space</kbd> loupe <kbd>C</kbd> compare <kbd>R</kbd> crop <kbd>S</kbd> subject <kbd>?</kbd> all shortcuts</span>
+  </footer>
+
+  <div id="overlay-loupe" class="overlay" hidden>
+    <div id="lz">
+      <div class="lz-bar"><span id="lz-name" class="muted"></span><span class="spacer"></span>
+        <button id="lz-subject" class="small" aria-pressed="false" title="Subject mode: drag a box around your subject (S)">Subject (S)</button>
+        <button id="lz-lr" class="small lr-open" hidden title="Open in Lightroom (Cmd+L)">Open in Lightroom <kbd>⌘L</kbd></button>
+        <span id="lz-denoise"></span><span id="lz-zoom"></span>
+        <button id="lz-close" class="small" title="Close (Space or Esc)">Close <kbd>Esc</kbd></button></div>
+      <div id="lz-view"><img id="big" alt="" draggable="false"></div>
+    </div>
+    <div class="hint">Space or Esc to close &middot; <kbd>Z</kbd> / double-click: 100 % &middot; pinch or <kbd>+</kbd> <kbd>&minus;</kbd> zoom, <kbd>0</kbd> fit &middot; drag to pan &middot; <kbd>S</kbd> subject box</div>
+    <div id="crop-ui" hidden>
+      <div id="crop-top">
+        <b>Crop</b> <span id="crop-name" class="muted"></span>
+        <span id="crop-ratios" role="group" aria-label="Ratio"></span>
+        <span id="crop-custom">Custom <input id="crop-w" type="text" inputmode="decimal" size="4" aria-label="Width" value="1.91">:<input id="crop-h" type="text" inputmode="decimal" size="4" aria-label="Height" value="1"> <button id="crop-custom-apply" class="small">Set</button></span>
+        <button id="crop-flip" title="Swap W:H (X)">Flip <kbd>X</kbd></button>
+        <button id="crop-clear" title="Clear the selected subjects and drawn boxes (Esc)">Clear selection</button>
+        <span id="crop-ratio-err" class="wiz-err" role="alert"></span>
+        <div id="crop-hint" class="crop-hint"><b>Click a subject, or drag to draw a box around it.</b> <span>A drawn box is kept whole inside the crop. Drag its corners to resize, drag inside to move, <kbd>Delete</kbd> removes it.</span></div>
+      </div>
+      <div id="crop-main">
+        <div id="crop-stage">
+          <img id="crop-img" alt="">
+          <div id="crop-dim-t" class="dim"></div><div id="crop-dim-b" class="dim"></div><div id="crop-dim-l" class="dim"></div><div id="crop-dim-r" class="dim"></div>
+          <div id="crop-cur" hidden title="The crop saved now"></div>
+          <div id="crop-subjects"></div>
+          <div id="crop-box" hidden>
+            <div class="grip" title="Drag to move the crop (or hold Cmd/Ctrl and drag anywhere inside it)">move crop</div>
+            <i class="handle" data-h="nw"></i><i class="handle" data-h="n"></i><i class="handle" data-h="ne"></i>
+            <i class="handle" data-h="e"></i><i class="handle" data-h="se"></i><i class="handle" data-h="s"></i>
+            <i class="handle" data-h="sw"></i><i class="handle" data-h="w"></i>
+          </div>
+          <div id="crop-uboxes"></div>
+          <div id="crop-draft" hidden></div>
+        </div>
+        <div id="crop-side">
+          <div id="crop-detector" class="note" hidden>Download the object detector (36 MB) for better people/animal detection. <button id="crop-detector-btn" class="small">Download (36 MB)</button></div>
+          <div class="crop-label">Suggestions <kbd>[</kbd> <kbd>]</kbd></div>
+          <div id="crop-cands"></div>
+          <div id="crop-warn" class="crop-warn" hidden></div>
+          <div class="crop-actions">
+            <button id="crop-accept" class="primary" title="Save this crop (Enter)">Accept <kbd>Enter</kbd></button>
+            <button id="crop-reject" title="Dismiss the suggestion (Backspace)">Reject <kbd>⌫</kbd></button>
+            <button id="crop-reset" title="Back to the full frame">Reset crop</button>
+          </div>
+          <div class="crop-hist"><select id="crop-history" aria-label="Crop history"></select> <button id="crop-restore" class="small">Restore</button></div>
+          <p id="crop-rotated" class="note" hidden></p>
+          <button id="crop-burst-btn" hidden>Apply to burst</button>
+          <div id="crop-burst"></div>
+          <p id="crop-msg" class="note" hidden></p>
+          <p class="muted crop-help"><b>Subjects:</b> click one to keep it (click again to deselect), Shift-click to add more, Option-click a face for a head shot, click empty space to point at something, or drag to draw a box around your own subject.<br><b>Crop:</b> drag its handles to resize, drag the "move crop" bar (or Cmd/Ctrl-drag) to move it. Esc clears the selection, Esc again leaves.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="overlay-compare" class="overlay" hidden role="dialog" aria-label="Compare frames">
+    <div class="cmp-head"><b>Compare</b> <span id="cmp-sub" class="muted"></span><span class="spacer"></span>
+      <span id="cmp-denoise"></span><span id="cmp-zoombar"></span>
+      <button id="cmp-link" class="small" aria-pressed="true" title="Zoom and pan both sides together (L)">Link <kbd>L</kbd></button>
+      <button id="cmp-close" class="small" title="Close (Esc)">Close <kbd>Esc</kbd></button></div>
+    <div class="cmp">
+      <figure id="cmp-fig-a" data-side="a"><figcaption id="cmp-a-cap"></figcaption>
+        <div class="cmp-view"><img id="cmp-a" alt="" draggable="false"></div>
+        <div class="cmp-metrics" id="cmp-a-m"></div>
+        <button id="cmp-keep-a" class="cmp-keep">Keep this one instead <kbd>1</kbd></button></figure>
+      <figure id="cmp-fig-b" data-side="b"><figcaption id="cmp-b-cap"></figcaption>
+        <div class="cmp-view"><img id="cmp-b" alt="" draggable="false"></div>
+        <div class="cmp-metrics" id="cmp-b-m"></div>
+        <button id="cmp-keep-b" class="cmp-keep">Keep this one instead <kbd>2</kbd></button></figure>
+    </div>
+    <div id="cmp-strip" class="cmp-strip" aria-label="Frames of this group"></div>
+    <div class="hint"><kbd>1</kbd> <kbd>2</kbd> or <kbd>←</kbd> <kbd>→</kbd> choose, <kbd>Enter</kbd> keeps the chosen one and rejects the other, <kbd>↑</kbd> <kbd>↓</kbd> next frame of the group, <kbd>+</kbd> <kbd>&minus;</kbd> <kbd>0</kbd> <kbd>Z</kbd> zoom, pinch or Ctrl-wheel zooms, <kbd>L</kbd> links / unlinks the two sides, <kbd>C</kbd> / <kbd>Esc</kbd> close</div>
+  </div>
+  <div id="overlay-cameras" class="overlay" hidden>
+    <div class="sheet" id="cameras-sheet"></div>
+  </div>
+  <div id="overlay-people" class="overlay" hidden role="dialog" aria-label="People">
+    <div class="sheet" id="people-sheet"></div>
+  </div>
+  <div id="overlay-jersey" class="overlay" hidden role="dialog" aria-label="Jersey numbers">
+    <div class="sheet" id="jersey-sheet"></div>
+  </div>
+  <div id="face-pop" role="dialog" aria-label="Face" hidden></div>
+  <div id="ctx-menu" class="menu" role="menu" hidden></div>
+  <div id="overlay-lr" class="overlay" hidden>
+    <div class="sheet" id="lr-sheet"></div>
+  </div>
+  <div id="overlay-shotlist" class="overlay" hidden>
+    <div class="sheet" id="shotlist-sheet"></div>
+  </div>
+  <div id="overlay-edit" class="overlay" hidden>
+    <div class="sheet" id="edit-sheet"></div>
+  </div>
+  <div id="overlay-help" class="overlay" hidden>
+    <div class="sheet">
+      <h2>Keyboard shortcuts</h2>
+      <h3>Browse</h3>
+      <div class="keys">
+        <div><span><kbd>←</kbd> <kbd>→</kbd></span><span>Previous / next image</span></div>
+        <div><span><kbd>↑</kbd> <kbd>↓</kbd></span><span>Previous / next group</span></div>
+        <div><span><kbd>Space</kbd></span><span>Toggle loupe / fullscreen</span></div>
+        <div><span><kbd>Tab</kbd></span><span>Cycle filter tabs (Shift+Tab reverses)</span></div>
+        <div><span><kbd>G</kbd></span><span>Collapse / expand groups (on a video frame: export it to frame_grabs/)</span></div>
+        <div><span><kbd>/</kbd></span><span>Search (Esc restores the grid)</span></div>
+        <div><span><kbd>A</kbd></span><span>Jump to the next audit item</span></div>
+      </div>
+      <h3>Decide</h3>
+      <div class="keys">
+        <div><span><kbd>P</kbd></span><span>Keep (press again: undo your choice, back to the AI decision)</span></div>
+        <div><span><kbd>X</kbd></span><span>Reject (press again: back to the AI decision)</span></div>
+        <div><span><kbd>1</kbd>–<kbd>5</kbd></span><span>Star rating (<kbd>0</kbd> clears it)</span></div>
+        <div><span><kbd>6</kbd> <kbd>7</kbd> <kbd>8</kbd> <kbd>9</kbd></span><span>Colour label red / yellow / green / blue (again removes it; purple and none from the right-click menu or the side panel)</span></div>
+      </div>
+      <h3>Select several photos</h3>
+      <div class="keys">
+        <div><span>Click</span><span>Select one photo</span></div>
+        <div><span><kbd>Cmd</kbd>+click</span><span>Add a photo to the selection or remove it</span></div>
+        <div><span><kbd>Shift</kbd>+click</span><span>Select the range from the last clicked photo (in the grid's current order)</span></div>
+        <div><span><kbd>Shift</kbd>+<kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd></span><span>Extend the selection</span></div>
+        <div><span><kbd>Cmd</kbd>+<kbd>A</kbd> / <kbd>Esc</kbd></span><span>Select every visible photo / clear the selection</span></div>
+        <div><span>Ctrl+click</span><span>On a Mac this is a right-click: it opens the menu (for the whole selection when you click inside it)</span></div>
+        <div><span><kbd>P</kbd> <kbd>X</kbd> <kbd>0</kbd>–<kbd>9</kbd></span><span>Keep, reject, stars and colour labels apply to every selected photo</span></div>
+        <div><span><kbd>Cmd</kbd>+<kbd>Delete</kbd></span><span>Move the selected photos to the Trash (asks first; recoverable with Undo or Put Back in Finder; <kbd>Cmd</kbd>+<kbd>Z</kbd> undoes)</span></div>
+      </div>
+      <h3>Filters</h3>
+      <div class="keys">
+        <div><span><kbd>Cmd</kbd>+<kbd>F</kbd></span><span>Search (same as <kbd>/</kbd>)</span></div>
+        <div><span><kbd>Shift</kbd>+<kbd>F</kbd></span><span>Show / hide the filter bar (filters stay active while it is hidden)</span></div>
+        <div><span>Filter bar</span><span>People, Picked / Unflagged / Rejected, colour labels, stars 0-5, and More: file type, orientation, warnings, faces, near-duplicates, camera and lens. Choices inside one group are OR, different groups are AND; they are remembered per shoot</span></div>
+        <div><span>Key faces</span><span>Side panel: click a face to filter by that person</span></div>
+      </div>
+      <h3>Faces and Lightroom</h3>
+      <div class="keys">
+        <div><span><kbd>Shift</kbd>+<kbd>P</kbd></span><span>People: every recognised person (rename, merge, ignore, show their photos)</span></div>
+        <div><span>Faces</span><span>Names and fixes live in the people strip, the Faces row of the side panel, People and Key faces (the loupe no longer draws face boxes)</span></div>
+        <div><span><kbd>Cmd</kbd>+<kbd>L</kbd></span><span>Open the selected image in Lightroom (RAW master; the XMP sidecar carries the rating and crop)</span></div>
+      </div>
+      <h3>Near-identical frames</h3>
+      <div class="keys">
+        <div><span><kbd>C</kbd></span><span>Compare the group's best with the current image (click a file name in "Why" to open that frame)</span></div>
+        <div><span><kbd>1</kbd> <kbd>2</kbd> / <kbd>←</kbd> <kbd>→</kbd></span><span>In compare: choose the frame to keep</span></div>
+        <div><span><kbd>Enter</kbd></span><span>In compare: keep the chosen frame, reject the other</span></div>
+        <div><span><kbd>↑</kbd> <kbd>↓</kbd></span><span>In compare: next frame of the group</span></div>
+        <div><span><kbd>L</kbd></span><span>In compare: link / unlink the zoom and pan of the two sides</span></div>
+      </div>
+      <h3>Zoom (loupe and compare)</h3>
+      <div class="keys">
+        <div><span><kbd>D</kbd></span><span>Denoise for viewing (main preview, loupe and compare; in compare <kbd>Shift</kbd>+<kbd>D</kbd> only the side under the pointer). Strength Low / Medium / High in the arrow next to the button; your files are never changed</span></div>
+        <div><span><kbd>Z</kbd> / double-click</span><span>Toggle Fit and 100 % (actual pixels) at the cursor</span></div>
+        <div><span><kbd>+</kbd> <kbd>&minus;</kbd> <kbd>0</kbd></span><span>Zoom in / out / back to Fit (also <kbd>Cmd</kbd>+<kbd>=</kbd> <kbd>Cmd</kbd>+<kbd>&minus;</kbd> <kbd>Cmd</kbd>+<kbd>0</kbd>)</span></div>
+        <div><span>Pinch / Ctrl-wheel</span><span>Zoom around the cursor</span></div>
+        <div><span>Two-finger scroll / drag</span><span>Pan while zoomed (the corner thumbnail can be dragged too)</span></div>
+        <div><span>&larr; &rarr;</span><span>Each photo remembers its own zoom and position; a photo you never zoomed opens at Fit</span></div>
+        <div><span>Crop mode</span><span>Zoom is off while cropping (leaving crop returns to Fit)</span></div>
+      </div>
+      <h3>Subject mode (S, in the loupe)</h3>
+      <div class="keys">
+        <div><span><kbd>S</kbd></span><span>Subject mode: the cursor becomes a crosshair; <b>drag</b> to draw a box around your subject (up to 6). Corners resize, drag inside to move, <kbd>X</kbd> / <kbd>Delete</kbd> removes the selected box</span></div>
+        <div><span>Score</span><span>Each box shows its sharpness (the same 0-1 scale as a face's sharpness): "in focus" or "soft", measured on the full-resolution pixels</span></div>
+        <div><span><kbd>Esc</kbd> / <kbd>S</kbd></span><span>Leave subject mode (the boxes stay, and crop mode keeps them in the crop)</span></div>
+      </div>
+      <h3>Crop mode (R)</h3>
+      <div class="keys">
+        <div><span><kbd>R</kbd></span><span>Crop mode: AI crop suggestions (Enter accepts, Backspace rejects, X flips, [ ] cycle, Esc leaves)</span></div>
+        <div><span>Click</span><span>A subject: keep it inside the crop (Shift adds more)</span></div>
+        <div><span>Drag</span><span>Draw a box around your own subject (corners resize, <kbd>Delete</kbd> removes it)</span></div>
+        <div><span><kbd>Esc</kbd></span><span>Clear the selection, then leave</span></div>
+      </div>
+      <h3>Anywhere</h3>
+      <div class="keys">
+        <div><span><kbd>?</kbd></span><span>This cheat-sheet</span></div>
+        <div><span><kbd>Esc</kbd></span><span>Close any overlay</span></div>
+      </div>
+      <div class="menu-actions">
+        <button id="btn-setup">Setup assistant</button>
+        <button id="btn-lrcard">What to do in Lightroom</button>
+        <button id="btn-quit">Quit ShotSieve</button>
+      </div>
+    </div>
+  </div>
+  <div id="overlay-onboarding" class="wiz-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="wiz-title">
+    <div class="wizard">
+      <header><span id="wiz-steps" class="muted" aria-live="polite"></span><button id="wiz-skip" class="small">Skip setup</button></header>
+      <div id="wiz-body"></div>
+    </div>
+  </div>
+  <div id="toast" role="status" hidden></div>
+  <script src="/static/desktop.js"></script>
+  <script src="/static/zoom.js"></script>
+  <script src="/static/denoise.js"></script>
+  <script src="/static/app.js"></script>
+  <script src="/static/crop.js"></script>
+  <script src="/static/compare.js"></script>
+  <script src="/static/faces.js"></script>
+  <script src="/static/subject.js"></script>
+  <script src="/static/people.js"></script>
+  <script src="/static/lightroom.js"></script>
+  <script src="/static/filters.js"></script>
+  <script src="/static/select.js"></script>
+  <script src="/static/onboarding.js"></script>
+  <script src="/static/menu.js"></script>
+</body>
+</html>

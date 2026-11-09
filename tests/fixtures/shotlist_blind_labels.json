@@ -1,0 +1,419 @@
+{
+ "_doc": "T17 BLIND held-out set (Review #7 N1). Written and frozen BEFORE the model was run on it; never used to fit TAU. Labels describe what a human sees in each image (contact-sheet inspection, no model output). 'present' items each match exactly one image in this folder; 'absent' items describe nothing in the blind images, in the 13 tau-fit search subjects, or in the 3 football photos. Corpus = blind images (1 frame each) + 13 search subjects x 5 variants + 3 football photos x 5 variants. All images are CC0 (Wikimedia Commons, category CC-Zero).",
+ "frozen_at": "2026-11-07 (before first scoring)",
+ "method_at_freeze": {
+  "TAU": 0.0751,
+  "Z_MIN": 3.0
+ },
+ "present": [
+  {
+   "item": "a pizza with tomato slices in a cardboard box",
+   "image": "pizza.jpg"
+  },
+  {
+   "item": "a fluffy kitten with blue eyes",
+   "image": "tabby_cat.jpg"
+  },
+  {
+   "item": "an acoustic guitar leaning against a wall",
+   "image": "acoustic_guitar.jpg"
+  },
+  {
+   "item": "a bicycle parked on a paved path",
+   "image": "bicycle.jpg"
+  },
+  {
+   "item": "a single sunflower in a field",
+   "image": "sunflower.jpg"
+  },
+  {
+   "item": "a bunch of red and yellow roses",
+   "image": "rose_bouquet.jpg"
+  },
+  {
+   "item": "a harbour city skyline lit up at night",
+   "image": "skyscrapers.jpg"
+  },
+  {
+   "item": "a red and white striped lighthouse by the sea",
+   "image": "lighthouse.jpg"
+  },
+  {
+   "item": "a white sailboat on the water",
+   "image": "sailboat.jpg"
+  },
+  {
+   "item": "snow capped mountains under a cloudy sky",
+   "image": "snow_mountain.jpg"
+  },
+  {
+   "item": "a long exposure waterfall in a forest",
+   "image": "waterfall.jpg"
+  },
+  {
+   "item": "a sandy beach with a wooden fence",
+   "image": "beach.jpg"
+  },
+  {
+   "item": "a bowl of ramen noodles with an egg",
+   "image": "ramen.jpg"
+  },
+  {
+   "item": "a croissant on a white plate with a cup of coffee",
+   "image": "croissant.jpg"
+  },
+  {
+   "item": "a barista pouring latte art into a cup",
+   "image": "latte.jpg"
+  },
+  {
+   "item": "a glass of red wine next to a bottle",
+   "image": "wine.jpg"
+  },
+  {
+   "item": "a double cheeseburger with a sesame seed bun",
+   "image": "burger.jpg"
+  },
+  {
+   "item": "a birthday cake with lit candles",
+   "image": "birthday_cake.jpg"
+  },
+  {
+   "item": "a giraffe standing at a zoo",
+   "image": "giraffe.jpg"
+  },
+  {
+   "item": "an owl flying with spread wings against a blue sky",
+   "image": "owl.jpg"
+  },
+  {
+   "item": "a black grand piano in a room",
+   "image": "piano.jpg"
+  },
+  {
+   "item": "a violin with its bow",
+   "image": "violin.jpg"
+  },
+  {
+   "item": "a green commuter train at a station platform",
+   "image": "train.jpg"
+  },
+  {
+   "item": "a tractor ploughing a field with white birds",
+   "image": "tractor.jpg"
+  },
+  {
+   "item": "a blue camping tent in the woods",
+   "image": "tent.jpg"
+  },
+  {
+   "item": "a red suspension bridge over a bay",
+   "image": "bridge_golden.jpg"
+  },
+  {
+   "item": "a windmill with sails against a blue sky",
+   "image": "windmill.jpg"
+  },
+  {
+   "item": "an orange sport motorcycle parked on a street",
+   "image": "motorcycle.jpg"
+  },
+  {
+   "item": "a person in a red kayak on the water",
+   "image": "kayak.jpg"
+  },
+  {
+   "item": "the nave of a church with wooden pews",
+   "image": "cathedral.jpg"
+  },
+  {
+   "item": "a tray of nigiri sushi",
+   "image": "sushi.jpg"
+  },
+  {
+   "item": "a field of red tulips",
+   "image": "tulips.jpg"
+  },
+  {
+   "item": "a penguin standing on the ground",
+   "image": "penguin.jpg"
+  },
+  {
+   "item": "a laptop on a wooden table",
+   "image": "laptop.jpg"
+  },
+  {
+   "item": "a floodlit sports stadium with spectators",
+   "image": "stadium.jpg"
+  },
+  {
+   "item": "a bride in a white dress holding a bouquet",
+   "image": "bride.jpg"
+  },
+  {
+   "item": "prickly pear cactus and agave plants",
+   "image": "cactus.jpg"
+  },
+  {
+   "item": "a clock tower decorated with string lights at night",
+   "image": "clock_tower.jpg"
+  },
+  {
+   "item": "an elephant with a handler in a street",
+   "image": "elephant.jpg"
+  },
+  {
+   "item": "a public bookcase full of books on a street",
+   "image": "bookshelf.jpg"
+  }
+ ],
+ "absent": [
+  "a plate of spaghetti with tomato sauce",
+  "a bowl of udon soup with vegetables",
+  "a bouquet of white lilies",
+  "a field of purple lavender",
+  "a skateboarder jumping in a skatepark",
+  "a cheetah running in the savannah",
+  "a zebra standing in tall grass",
+  "a flock of flamingos standing in water",
+  "a cargo ship carrying containers at sea",
+  "a wooden rowing boat moored at a dock",
+  "a cup of green tea with a teapot",
+  "a stack of pancakes with syrup",
+  "a glass of beer with foam",
+  "a slice of chocolate cake on a plate",
+  "a cupcake with colourful sprinkles",
+  "a drum kit on a stage",
+  "a saxophone player on a stage",
+  "a cello leaning against a chair",
+  "a fighter jet taking off",
+  "a helicopter hovering over a city",
+  "a cruise ship in a harbour",
+  "an igloo in the snow",
+  "a desert with sand dunes",
+  "a palm tree on a tropical island",
+  "a frozen lake in winter",
+  "a medieval stone castle on a hill",
+  "a gothic cathedral exterior with two towers",
+  "a mosque with a golden dome",
+  "the Eiffel Tower at night",
+  "a wedding cake with flowers",
+  "a groom in a black tuxedo",
+  "a desktop computer with two monitors",
+  "a smartphone lying on a table",
+  "a rhinoceros in the grass",
+  "a polar bear on the ice",
+  "a hot dog with mustard",
+  "a tennis player serving",
+  "a swimmer in a swimming pool",
+  "an astronaut floating in space",
+  "a snowboarder on a snowy slope",
+  "a bonfire on a beach at night",
+  "a tiger in a zoo enclosure",
+  "a parrot perched on a branch",
+  "two men playing chess",
+  "a ferris wheel lit up at night"
+ ],
+ "images": {
+  "pizza.jpg": {
+   "commons_title": "File:Pizza ( Italian Food).jpg",
+   "license": "CC0",
+   "sha256": "d518afa26b341c605cc30013fd9bfeae69a65397b2bd552a8876274f03e35304"
+  },
+  "tabby_cat.jpg": {
+   "commons_title": "File:Tabby cat with blue eyes-3336579.jpg",
+   "license": "CC0",
+   "sha256": "68d7f7e226c460035e0577e770d674d8656da88d9da8623c23663ea6982311be"
+  },
+  "acoustic_guitar.jpg": {
+   "commons_title": "File:Fender California Series Acoustic Guitar (serial no. CSC10001615) (2018-04-26 13.21.46 Piqsels.com id olkmb).jpg",
+   "license": "CC0",
+   "sha256": "255b42cae660ccfaa90d0580c677ab15cfa0d593e813e629466b2896bbd61ae5"
+  },
+  "bicycle.jpg": {
+   "commons_title": "File:Bicycle 02.jpg",
+   "license": "CC0",
+   "sha256": "cd0aef7c7784fd1ea1296d0dd302c38c52109c604b575ec2c72c59326dfb70f6"
+  },
+  "sunflower.jpg": {
+   "commons_title": "File:Sunflower Fields.jpg",
+   "license": "CC0",
+   "sha256": "6b58e9c98ec5728c193e558e4614aeb640a4193a64c72c2ebffb7cce7f1da581"
+  },
+  "rose_bouquet.jpg": {
+   "commons_title": "File:Bouquet of red and yellow roses.jpg",
+   "license": "CC0",
+   "sha256": "5e15b10b83e6db1174267cccc8e14b67db8a90c2a4a18074ac4a1951971a5e9e"
+  },
+  "skyscrapers.jpg": {
+   "commons_title": "File:Victoria Harbour skyscrapers.jpg",
+   "license": "CC0",
+   "sha256": "a0917b6e1edd56362f96e629b98d13d914e04a0b52c33828933cc943bce078ce"
+  },
+  "lighthouse.jpg": {
+   "commons_title": "File:Lighthouse Zadar.jpg",
+   "license": "CC0",
+   "sha256": "99679e95d0ccdf7c86e145f9f92220b2ceb16603f6561f689332bbc6b9dec7ec"
+  },
+  "sailboat.jpg": {
+   "commons_title": "File:Hunter 260 sailboat Sea Esta 3784.jpg",
+   "license": "CC0",
+   "sha256": "09f2b7d5ed8ba0499a7933dd48e024866c3dfce0950b8ce68690077ca6c92066"
+  },
+  "snow_mountain.jpg": {
+   "commons_title": "File:Snowy Annapurna Range - panorama.jpg",
+   "license": "CC0",
+   "sha256": "1046b9ffdd1479546fc3dba7a1293b10ebc7cef22062692cc4047ba0ecf1b89f"
+  },
+  "waterfall.jpg": {
+   "commons_title": "File:Waterfall in forest.jpg",
+   "license": "CC0",
+   "sha256": "0ddc1a3107a586693ba9b61b181d2e257e5925c6f158b3680c81e6a085b32e38"
+  },
+  "beach.jpg": {
+   "commons_title": "File:Opening to beach at Sea Bright NJ.jpg",
+   "license": "CC0",
+   "sha256": "ec78fed6d78793185948afc2c2eea44cb2671d2b57af9fa4bdd96948d8aac9fb"
+  },
+  "ramen.jpg": {
+   "commons_title": "File:Ramen Jump 002.jpg",
+   "license": "CC0",
+   "sha256": "dfb99ed9b0a6003c8a78389d8f3f96719ede365033a9b377ea10683fc9794649"
+  },
+  "croissant.jpg": {
+   "commons_title": "File:Croissant with jam and butter - Little Miss Piggies.jpg",
+   "license": "CC0",
+   "sha256": "7eefcf9223b579115bd6229a0cdd03eb1332372a70b25a5d5a8e701dfc058a10"
+  },
+  "latte.jpg": {
+   "commons_title": "File:Close-up of Woman Holding Coffee Cup at Cafe (28217840617).jpg",
+   "license": "CC0",
+   "sha256": "d9571283d744d11fc56194c04282e1b938ad1a1c53b8d8bc20057a30fdd53eca"
+  },
+  "wine.jpg": {
+   "commons_title": "File:Bottle and glass of red wine.jpg",
+   "license": "CC0",
+   "sha256": "787196ee7d90f7905b426dada1ac2e07f59be6f287d8710cea8fbfc3347dcc79"
+  },
+  "burger.jpg": {
+   "commons_title": "File:Big Mac hamburger.jpg",
+   "license": "CC0",
+   "sha256": "fa23eec472677cadd0876b6bfd76186e0e68c27f8b09c8e4869860b20507336c"
+  },
+  "birthday_cake.jpg": {
+   "commons_title": "File:Birthday party cake.jpg",
+   "license": "CC0",
+   "sha256": "a3281b9b88813f23393dab8070c2617b9b820f963079c6b189359967f2c6b8a7"
+  },
+  "giraffe.jpg": {
+   "commons_title": "File:Giraffe - Auckland Zoo - Auckland, NZ - DSC07024.jpg",
+   "license": "CC0",
+   "sha256": "1662fe3afb56a5d49bfbd864f762a4eaf40cc00e9689fe2f2f9d924075ea9d17"
+  },
+  "owl.jpg": {
+   "commons_title": "File:Front view of a barn owl - Tyto alba - in flight.jpg",
+   "license": "CC0",
+   "sha256": "43dccad4b7f7555795f94c83c4b5b7756fd175a4dc84707f0dfa2cf6eb22fddd"
+  },
+  "piano.jpg": {
+   "commons_title": "File:Sohmer & Co. grand piano (2012-07-31 18.06.15 @pxhere 1347760).jpg",
+   "license": "CC0",
+   "sha256": "3994f64206cae26f4ee11536506037f7c5c5fae8d2fb33c1eafb933740653a32"
+  },
+  "violin.jpg": {
+   "commons_title": "File:Ginger Smock's violin, at the Smithsonian.jpg",
+   "license": "CC0",
+   "sha256": "c74cdfec17e7df8b9a46e3881148cd4d10d0b500b3a20c092a09de53923d77b0"
+  },
+  "train.jpg": {
+   "commons_title": "File:A train at East Croydon.jpg",
+   "license": "CC0",
+   "sha256": "9ff380c50ed4df92b6ac523273749807ab9fd2cbd36b54cdbe27d5637ddcd7bc"
+  },
+  "tractor.jpg": {
+   "commons_title": "File:Tractor cultivating a field in Brittany.jpg",
+   "license": "CC0",
+   "sha256": "75c74c11def0c74250fac161e9478d962376c66fb9e50b40703fef601dee3445"
+  },
+  "tent.jpg": {
+   "commons_title": "File:Camping tent on tarp.jpg",
+   "license": "CC0",
+   "sha256": "82e0f1cc2a9f419429f6824c70828bdf3cfea618dee1fcb082aa1401f2671eae"
+  },
+  "bridge_golden.jpg": {
+   "commons_title": "File:Golden Gate Bridge - Feb 2024.jpg",
+   "license": "CC0",
+   "sha256": "e476e41847ca207fffa335f71ce279647edb436cfadba62aa5588c24e2854722"
+  },
+  "windmill.jpg": {
+   "commons_title": "File:Upminster Windmill in 2021.jpg",
+   "license": "CC0",
+   "sha256": "e68b87b81267f2a8fd7ba8c02dfa001ee745fe2d378c9bc2ec9156a706b59bf4"
+  },
+  "motorcycle.jpg": {
+   "commons_title": "File:Moscow, Suzuki motorcycle September 2024 01.jpg",
+   "license": "CC0",
+   "sha256": "a1e0453cefe50c84fb9bb84adb23be4179421b05b261cea0062c783a7f9dc6f2"
+  },
+  "kayak.jpg": {
+   "commons_title": "File:Kajakroer sejler forbi Bådeklubben Sjællandsbroen.jpg",
+   "license": "CC0",
+   "sha256": "c954e1c45f7cf768778221f7ada0d626737a3b98987e9befe769e4883af1b2a4"
+  },
+  "cathedral.jpg": {
+   "commons_title": "File:St Marys Cathedral Nave Edinburgh.jpg",
+   "license": "CC0",
+   "sha256": "d1ce1185b8901489648e409a2cfeedbdf1a4f1ac4b985eedf045a8371cacb334"
+  },
+  "sushi.jpg": {
+   "commons_title": "File:Sushi in Echigo Yuzawa.jpg",
+   "license": "CC0",
+   "sha256": "c955dcd5d7cb55255df39f9d1f81584002407e658eaac6179c9cc7a6fd46b78a"
+  },
+  "tulips.jpg": {
+   "commons_title": "File:Tulip Field Tulips Red Holland Nature Flowers.jpg",
+   "license": "CC0",
+   "sha256": "c9e3fcd1b579e71642fdecc8537d183aa9214f73b033200d4654bb79b6c5853d"
+  },
+  "penguin.jpg": {
+   "commons_title": "File:Portrait of an African penguin walking fast.jpg",
+   "license": "CC0",
+   "sha256": "b8728c23b042debcb7b4c21bbb4ea094455c10ffabaaf37f49104c85e83a4e90"
+  },
+  "laptop.jpg": {
+   "commons_title": "File:Desk-laptop-notebook-table (23697249344).jpg",
+   "license": "CC0",
+   "sha256": "40126201586689bc8f1dd7cfaef7e39b4b79ecf0bdb6e9d18377214067aba782"
+  },
+  "stadium.jpg": {
+   "commons_title": "File:Bangabandhu National Stadium crowd, Home match day FIFA WC qualifier 2019.jpg",
+   "license": "CC0",
+   "sha256": "83b88f78d3850dd878de887bdf8013f129bd8b0e8c5f58da1ef3d39ac61e5161"
+  },
+  "bride.jpg": {
+   "commons_title": "File:Wedding photo.jpg",
+   "license": "CC0",
+   "sha256": "fbf3955b4e1fbbb81048f024b2fc343427a3bbad27333810121011d9b844b2bd"
+  },
+  "cactus.jpg": {
+   "commons_title": "File:Pricklypear (Cactaceae).jpg",
+   "license": "CC0",
+   "sha256": "f01601e3e96f5927aba9cbb826d6d87c16fdce3ed7cc41ed4e496d996b03abfb"
+  },
+  "clock_tower.jpg": {
+   "commons_title": "File:Brighton clock tower with xmas lightings at night.jpg",
+   "license": "CC0",
+   "sha256": "67d23e57a354b3dde8de257b6f6e0c61922cc6c35bdbb6057c72f38026981f4e"
+  },
+  "elephant.jpg": {
+   "commons_title": "File:Elephant animal.jpg",
+   "license": "CC0",
+   "sha256": "90877a525271d19231422a6acca7c0ff33af9802d03a3b441f9c14127ffd7173"
+  },
+  "bookshelf.jpg": {
+   "commons_title": "File:Public bookcase of the Muri-Gümligen municipal library.jpg",
+   "license": "CC0",
+   "sha256": "6fd405efaf37efcd119841fb5c17dc502ed5500431c0ea2279207263f6037ff1"
+  }
+ }
+}

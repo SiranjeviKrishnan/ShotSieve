@@ -1,0 +1,14 @@
+ShotSieve
+Copyright 2026 The ShotSieve Authors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+The ShotSieve release app (ShotSieve.app / .dmg) bundles third-party software and machine-learning
+models under their own licences. They are listed, with licence names, sources and the obligations
+that apply, in THIRD_PARTY_NOTICES.md; the licence texts that are not already inside each package
+are in the licenses/ folder.
+
+ShotSieve's source code is Apache-2.0. The .dmg also contains components under GPL-3.0 / GPL-2.0
+(FFmpeg, x264, x265 in the bundled OpenCV and pillow-heif wheels) and LGPL licences, so the .dmg
+as a whole is not purely Apache-2.0; see THIRD_PARTY_NOTICES.md for those licences, their exact
+versions and the corresponding source (ShotSieve-<version>-gpl-sources.tar.gz on the same release).

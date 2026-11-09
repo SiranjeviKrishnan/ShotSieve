@@ -1,0 +1,5 @@
+Wikimedia Commons, license CC0 1.0 (verified through the Commons API extmetadata, 2026-11-07).
+cc0_football_18.jpg  File:James Rodgers (American football) 2013.jpg  (jersey 18)
+cc0_football_47.jpg  File:Ray Drew 2013.jpg                          (jersey 47)
+cc0_football_64.jpg  File:Jared Smith (American football) 2015.jpg   (jersey 64)
+Numbers were read by eye from the images. Used only by tests/test_ocr.py.

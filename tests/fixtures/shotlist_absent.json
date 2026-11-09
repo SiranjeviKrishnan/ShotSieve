@@ -1,0 +1,25 @@
+{
+ "_doc": "20 shot-list items with NO relevant frame in the 13-subject search corpus (tests/test_search_real.py); with the 30 labelled queries of search_queries.json they form the T17 accuracy set (30 present + 20 absent) and the tau fit (scripts/fit_shotlist.py)",
+ "absent": [
+  "the bride and groom kissing",
+  "a wedding cake with candles",
+  "a cat sleeping on a sofa",
+  "a sailboat on the sea",
+  "a snowy mountain peak",
+  "a guitarist performing on stage",
+  "a child blowing out birthday candles",
+  "a bowl of ramen noodles",
+  "an airplane taking off",
+  "a person riding a bicycle",
+  "a horse galloping in a field",
+  "a plate of sushi",
+  "a laptop on an office desk",
+  "a lighthouse on a cliff",
+  "a hot air balloon in the sky",
+  "a baby sleeping in a crib",
+  "an elephant walking",
+  "a surfer riding a wave",
+  "a fireworks display at night",
+  "a chef cooking in a kitchen"
+ ]
+}

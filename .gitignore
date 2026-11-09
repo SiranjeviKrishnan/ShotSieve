@@ -1,0 +1,65 @@
+# ---- environments, caches, tools (anchored: a bare `models/` would also hide src/shotsieve/models)
+/.venv/
+/.uv-cache/
+/.uv-python/
+/.tools/
+/.tools.*/
+/.app-build.*/
+/.playwright/
+/.pytest_cache/
+/.pytest_tmp*/
+/.ruff_cache/
+/.mypy_cache/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.coverage
+htmlcov/
+
+# ---- runtime data (never committed: settings, caches, logs, personal model)
+/data/
+.shotsieve/
+.bench.lock
+*.log
+*.bak
+*.orig
+*.tmp
+*.part
+
+# ---- model weights: downloaded by scripts/fetch_models.py (pinned URLs + sha256)
+/models/*
+!/models/README.md
+*.onnx
+*.task
+*.tflite
+*.pt
+*.pth
+*.safetensors
+siglip2_tokenizer.json
+
+# ---- build output
+/build/
+/dist/
+*.dmg
+*.dmg.sha256
+/ShotSieve.app/
+
+# ---- generated test fixtures (rebuilt by scripts/make_fixtures.py)
+/tests/fixtures/generated/
+
+# ---- OS / editors
+.DS_Store
+.AppleDouble
+._*
+.idea/
+.vscode/
+*.swp
+*~
+
+# ---- machine-specific fixture outputs (absolute paths inside): rebuilt by scripts/make_edit_styles.py
+/tests/fixtures/edit_styles/*.lrcat
+/tests/fixtures/edit_styles/manifest.json
+
+# ---- local-only privacy patterns (personal strings never go into the repository)
+/.privacy_patterns.local

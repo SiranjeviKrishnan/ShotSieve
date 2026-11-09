@@ -1,0 +1,513 @@
+{
+ "_doc": "T17 BLIND held-out set #2 (Review #7 N1). Authored by an independent agent (not the builder), who did not read or run the method, thresholds, or fit scripts. Labels describe what a human sees in each image (contact-sheet inspection, no model output). This set has NEVER been scored. 'present' items each match exactly one image in this folder. 'absent' items are semantic near-misses of things in the images (similar scene/object, clearly not depicted) plus some easy ones; none is depicted in any of these images. Images are CC0 or public domain from Wikimedia Commons (per-image source_url, author, license below), resized to <=1024 px long side JPEG; sha256 is of the stored file. Rules: scored exactly once; no label or threshold edits after seeing results; errata are recorded separately, the original stays official.",
+ "frozen_at": "2026-11-08",
+ "author": "independent agent (not the builder)",
+ "never_scored": true,
+ "present": [
+  {
+   "item": "a mossy tree trunk among fallen autumn leaves in a forest",
+   "image": "autumn_forest.jpg"
+  },
+  {
+   "item": "bunches of ripe bananas at a market stall",
+   "image": "bananas.jpg"
+  },
+  {
+   "item": "a spiny cactus with long pale needles",
+   "image": "cactus.jpg"
+  },
+  {
+   "item": "a campfire burning at dusk among trees",
+   "image": "campfire.jpg"
+  },
+  {
+   "item": "a canoe on a turquoise mountain lake",
+   "image": "canoe.jpg"
+  },
+  {
+   "item": "a wooden cheese board with crackers, grapes and dips",
+   "image": "cheese_board.jpg"
+  },
+  {
+   "item": "cherry trees in bloom along a river",
+   "image": "cherry_blossom.jpg"
+  },
+  {
+   "item": "a wooden chessboard with the pieces set up",
+   "image": "chess.jpg"
+  },
+  {
+   "item": "the interior of a church with pews and an altar",
+   "image": "church_interior.jpg"
+  },
+  {
+   "item": "a building with a clock tower under a blue sky",
+   "image": "clock_tower.jpg"
+  },
+  {
+   "item": "the inside of a wooden covered bridge",
+   "image": "covered_bridge.jpg"
+  },
+  {
+   "item": "a deer lying down on a cobbled pavement",
+   "image": "deer.jpg"
+  },
+  {
+   "item": "sugar-dusted donuts arranged in baking trays",
+   "image": "donuts.jpg"
+  },
+  {
+   "item": "a vintage red fire truck parked in a garage",
+   "image": "fire_truck.jpg"
+  },
+  {
+   "item": "a basketball hoop mounted on a wooden pole",
+   "image": "basketball_hoop.jpg"
+  },
+  {
+   "item": "a glacier with a wall of blue ice beside a lake",
+   "image": "glacier.jpg"
+  },
+  {
+   "item": "a hand holding an ice cream cone",
+   "image": "ice_cream.jpg"
+  },
+  {
+   "item": "wooden bookshelves full of books beneath round windows",
+   "image": "bookshelves.jpg"
+  },
+  {
+   "item": "a stack of pancakes with syrup being poured",
+   "image": "pancakes.jpg"
+  },
+  {
+   "item": "a green parakeet behind a wire fence",
+   "image": "parrot.jpg"
+  },
+  {
+   "item": "a concert stage lit with purple lights at night",
+   "image": "concert_stage.jpg"
+  },
+  {
+   "item": "a red fox walking across a snowy field",
+   "image": "red_fox.jpg"
+  },
+  {
+   "item": "a steam locomotive crossing a bridge with black smoke",
+   "image": "steam_train.jpg"
+  },
+  {
+   "item": "an old stone arch bridge over a shallow river",
+   "image": "stone_bridge.jpg"
+  },
+  {
+   "item": "a plastic container of strawberries held in a hand",
+   "image": "strawberries.jpg"
+  },
+  {
+   "item": "plates of sushi and sashimi on a wooden table",
+   "image": "sushi.jpg"
+  },
+  {
+   "item": "an old telescope inside an observatory dome",
+   "image": "telescope.jpg"
+  },
+  {
+   "item": "a blue dome tent pitched in the woods",
+   "image": "tent.jpg"
+  },
+  {
+   "item": "a vintage red tractor parked on grass",
+   "image": "tractor.jpg"
+  },
+  {
+   "item": "a red vintage tram with the number 2170",
+   "image": "tram.jpg"
+  },
+  {
+   "item": "rows of red tulips in a field",
+   "image": "tulip_field.jpg"
+  },
+  {
+   "item": "a black manual typewriter with paper loaded",
+   "image": "typewriter.jpg"
+  },
+  {
+   "item": "raindrops on blue fabric",
+   "image": "raindrops.jpg"
+  },
+  {
+   "item": "a shop display shelf full of vintage cameras",
+   "image": "camera_shelves.jpg"
+  },
+  {
+   "item": "a violin with its bow",
+   "image": "violin.jpg"
+  },
+  {
+   "item": "a white windmill with sails against a blue sky",
+   "image": "windmill.jpg"
+  },
+  {
+   "item": "an electronic drum kit on a white background",
+   "image": "drum_kit.jpg"
+  },
+  {
+   "item": "an elephant standing beside a street",
+   "image": "elephant.jpg"
+  },
+  {
+   "item": "a red and blue helicopter flying in the sky",
+   "image": "helicopter.jpg"
+  },
+  {
+   "item": "a bronze statue of a galloping horse",
+   "image": "horse_statue.jpg"
+  },
+  {
+   "item": "a red barn in a dry grass field",
+   "image": "red_barn.jpg"
+  }
+ ],
+ "absent": [
+  "a gray wolf standing in the snow",
+  "a rhinoceros standing in tall grass",
+  "a donkey standing on a village road",
+  "a moose wading in a lake",
+  "a passenger airplane taking off from a runway",
+  "a hot air balloon floating over a valley",
+  "a diesel freight train hauling coal wagons",
+  "a cable car climbing a mountain",
+  "a red double-decker bus on a city street",
+  "a kayaker paddling down a river",
+  "a tent pitched on a snowy mountain ridge",
+  "a gas camping stove boiling a pot of water",
+  "a fireplace with burning logs",
+  "a bowl of blueberries",
+  "a basket of red apples",
+  "a pile of oranges at a fruit stand",
+  "slices of watermelon on a plate",
+  "a plate of waffles with whipped cream",
+  "a slice of chocolate cake",
+  "a plate of steamed dumplings",
+  "a cupcake with pink frosting",
+  "a field of red poppies",
+  "a snow covered pine forest",
+  "a saguaro cactus at sunset",
+  "an iceberg floating in the sea",
+  "a volcano erupting with flowing lava",
+  "a medieval stone castle on a hill",
+  "a suspension bridge over a bay",
+  "a Ferris wheel lit up at night",
+  "a crowded subway platform",
+  "a trumpet resting on a table",
+  "a saxophone resting on a stand",
+  "a camera with a long lens on a tripod",
+  "a laptop on a wooden desk",
+  "an old rotary telephone",
+  "a pocket watch on a chain",
+  "a stack of playing cards",
+  "an open umbrella on a rainy street",
+  "the Milky Way over a mountain at night",
+  "a vintage red convertible car",
+  "a combine harvester in a wheat field",
+  "a scarlet macaw perched on a branch",
+  "a flock of pigeons in a town square",
+  "a penguin colony on the ice",
+  "a bald eagle perched on a branch",
+  "a golden retriever puppy on grass",
+  "a flock of sheep grazing on a hillside",
+  "a person riding a horse along a beach",
+  "a soccer goal with a net on a pitch",
+  "a tennis court with a net"
+ ],
+ "images": {
+  "autumn_forest.jpg": {
+   "commons_title": "File:Autumn Forest Wet Bark.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Autumn_Forest_Wet_Bark.jpg",
+   "author": "Martin Vorel",
+   "license": "CC0",
+   "sha256": "aaae4b6a076f5f9c79f3443ad1d05a541cc040e0ef79e0af75804335856bb4bc"
+  },
+  "bananas.jpg": {
+   "commons_title": "File:Bunch of bananas on sale.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Bunch_of_bananas_on_sale.jpg",
+   "author": "Wilfredor",
+   "license": "CC0",
+   "sha256": "8b572107f3b6e3a28a26a933dba0c357687c8d7e45ddea952851e2290af072cf"
+  },
+  "cactus.jpg": {
+   "commons_title": "File:Cholla cactus Mojave Desert 0023.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Cholla_cactus_Mojave_Desert_0023.jpg",
+   "author": "ImagePerson",
+   "license": "CC0",
+   "sha256": "046bfee970979594d24da82cea8ea0634c36d7b3167b5a5c4dff8d7145a0ecd9"
+  },
+  "campfire.jpg": {
+   "commons_title": "File:Campfire 20221029 180334.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Campfire_20221029_180334.jpg",
+   "author": "01x07x2022000",
+   "license": "CC0",
+   "sha256": "ddc16c241368ba8e3668c1a125239a58365c4256c3ed9022c2be2d2d64ba0de3"
+  },
+  "canoe.jpg": {
+   "commons_title": "File:The Lone Canoe (Unsplash).jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:The_Lone_Canoe_(Unsplash).jpg",
+   "author": "Braxton Stuntz braxton",
+   "license": "CC0",
+   "sha256": "44c7738e712aece5e6277ee5f716c12421fcf7f330714dfd924e5dca93b7b2d3"
+  },
+  "cheese_board.jpg": {
+   "commons_title": "File:Cheese board - Christchurch, New Zealand.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Cheese_board_-_Christchurch,_New_Zealand.jpg",
+   "author": "Daderot",
+   "license": "CC0",
+   "sha256": "1e9ba88df2e6ba8341581f6992ddd4d9b30319a17967b9be301517e186beb8e2"
+  },
+  "cherry_blossom.jpg": {
+   "commons_title": "File:Mt Hiei with Cherry Blossom.JPG",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Mt_Hiei_with_Cherry_Blossom.JPG",
+   "author": "Hahifuheho",
+   "license": "CC0",
+   "sha256": "687eb48d12a73689cb0d047d7347e0ccf57d65eccc9729919dc328858041b708"
+  },
+  "chess.jpg": {
+   "commons_title": "File:Chess game Staunton No. 6 perfil view 8.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Chess_game_Staunton_No._6_perfil_view_8.jpg",
+   "author": "Wilfredor",
+   "license": "CC0",
+   "sha256": "32b4a1faaf26e1f05ef948f811c35decde8b0fe48796f8f70d855263bdf2b3f8"
+  },
+  "church_interior.jpg": {
+   "commons_title": "File:Church of Saint Barbara in Viciebsk - Interior 01.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Church_of_Saint_Barbara_in_Viciebsk_-_Interior_01.jpg",
+   "author": "Flexagoon",
+   "license": "CC0",
+   "sha256": "122e7da3ef815704a894fb406283fd9affd27a2d449d9484c3dabb487d44557e"
+  },
+  "clock_tower.jpg": {
+   "commons_title": "File:LaCenterra Clock Tower Side View 2024.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:LaCenterra_Clock_Tower_Side_View_2024.jpg",
+   "author": "Codelongandpros",
+   "license": "CC0",
+   "sha256": "ad3cbff824be9d43b6ba5adf4a9d667f77c1b75389b2ea4b098d56373afacd9f"
+  },
+  "covered_bridge.jpg": {
+   "commons_title": "File:Arthur A. Smith Covered Bridge - interior.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Arthur_A._Smith_Covered_Bridge_-_interior.jpg",
+   "author": "Waz8",
+   "license": "CC0",
+   "sha256": "b1de66f335ea4228dae329b8b11ec8c932fbe7012c87bcdc868b7c3e8c8cdccd"
+  },
+  "deer.jpg": {
+   "commons_title": "File:Nara deer lounging at Todaiji.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Nara_deer_lounging_at_Todaiji.jpg",
+   "author": "Photos of Japan",
+   "license": "CC0",
+   "sha256": "f673c18e04e62278665f5803dda1037796a0a5866a8b2f25ee184951e4801a30"
+  },
+  "donuts.jpg": {
+   "commons_title": "File:Donuts from Slovakia.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Donuts_from_Slovakia.jpg",
+   "author": "Szombat78",
+   "license": "CC0",
+   "sha256": "49ef4f5a5a762ce08beb671c9b8f4ad748d86a2e81b90898baad519ee9b30d65"
+  },
+  "fire_truck.jpg": {
+   "commons_title": "File:Toyopet Truck fire engine.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Toyopet_Truck_fire_engine.jpg",
+   "author": "TTTNIS",
+   "license": "CC0",
+   "sha256": "e30ebeaf25f9c4e3a29e8767d068ce8b47a47b6963663baef3aceb6af088d57d"
+  },
+  "basketball_hoop.jpg": {
+   "commons_title": "File:Basketball hoop with chains - Arlington, MA.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Basketball_hoop_with_chains_-_Arlington,_MA.jpg",
+   "author": "Daderot",
+   "license": "CC0",
+   "sha256": "6d0687590c89122cd21b3edc3c59b9ff529f301508575dbb9e423002bb8546bc"
+  },
+  "glacier.jpg": {
+   "commons_title": "File:Glacier and lake (Unsplash).jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Glacier_and_lake_(Unsplash).jpg",
+   "author": "Amar Adestiempo amaradestiempo",
+   "license": "CC0",
+   "sha256": "81d49190094372dec9327a69eddd5eb34b881e99997bc25905bca660e0ad021b"
+  },
+  "ice_cream.jpg": {
+   "commons_title": "File:Ice cream cone with spoon.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Ice_cream_cone_with_spoon.jpg",
+   "author": "Thegreatmutata",
+   "license": "CC0",
+   "sha256": "cb5972dfcfaffa896203bce8cb411f0d7c96e2d827e03904a76291e487820ef7"
+  },
+  "bookshelves.jpg": {
+   "commons_title": "File:Bookshelves in Hove Library 2025-08-20.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Bookshelves_in_Hove_Library_2025-08-20.jpg",
+   "author": "Andy Li",
+   "license": "CC0",
+   "sha256": "3b5cfe7c5e1890e53ee3a19d0f182af1fb54f89438dd0d2c874bb718f97911d1"
+  },
+  "pancakes.jpg": {
+   "commons_title": "File:Foodiesfeed.com pouring-honey-on-pancakes-with-walnuts.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Foodiesfeed.com_pouring-honey-on-pancakes-with-walnuts.jpg",
+   "author": "Mae Mu",
+   "license": "CC0",
+   "sha256": "39ad7820f0ff382b70164f03813cfeeb8976335808c4c1176dee0f4f2b6f03c2"
+  },
+  "parrot.jpg": {
+   "commons_title": "File:Parrot in cage not free.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Parrot_in_cage_not_free.jpg",
+   "author": "RajuBarua007",
+   "license": "CC0",
+   "sha256": "81c82a87f23485310c1ba56a7cfcafb8421562e47524a506eaa10ee6b859953a"
+  },
+  "concert_stage.jpg": {
+   "commons_title": "File:The Smashing Pumpkins al Festival Cruïlla 2024 20240714 09.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:The_Smashing_Pumpkins_al_Festival_Cru%C3%AFlla_2024_20240714_09.jpg",
+   "author": "Aniol",
+   "license": "CC0",
+   "sha256": "73708a49ca3354e6ea0adc4a82ec7f0ffd1477c79538ac8fe9d6906ddbf690d0"
+  },
+  "red_fox.jpg": {
+   "commons_title": "File:Red fox in yard, Charlton MA 2025-12-26.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Red_fox_in_yard,_Charlton_MA_2025-12-26.jpg",
+   "author": "Peter Cooper Jr.",
+   "license": "CC0",
+   "sha256": "18042d482f2a2d36fc63c430cec13977bda26938444d1f791e54ee36cf8ddf0e"
+  },
+  "steam_train.jpg": {
+   "commons_title": "File:JA1271 crossing the Otaki River.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:JA1271_crossing_the_Otaki_River.jpg",
+   "author": "Karora",
+   "license": "Public domain",
+   "sha256": "6f6eff5e5c4f5656d3d505b56348577e916089aa165e8330fb1fe6dc5b0dc242"
+  },
+  "stone_bridge.jpg": {
+   "commons_title": "File:Stone Arch Bridge at Tongdosa Temple.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Stone_Arch_Bridge_at_Tongdosa_Temple.jpg",
+   "author": "Bernard Gagnon",
+   "license": "CC0",
+   "sha256": "772aa90fcf73f880d7af431322a061ca0ea46def58ef55f603921f0af73d6496"
+  },
+  "strawberries.jpg": {
+   "commons_title": "File:Strawberries in a tray.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Strawberries_in_a_tray.jpg",
+   "author": "Jiafei Slay Queen",
+   "license": "CC0",
+   "sha256": "ac442c7193a3937db08be4d40d082c7e2ac6620b3c1b00491e7983a8975b289e"
+  },
+  "sushi.jpg": {
+   "commons_title": "File:2009, sushi in Otaru.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:2009,_sushi_in_Otaru.jpg",
+   "author": "Syced",
+   "license": "CC0",
+   "sha256": "5fe45289f4040842b8bec58de04e82035462d0d2c8a0728f824a6e6b50e5191c"
+  },
+  "telescope.jpg": {
+   "commons_title": "File:Observatory Telescope at the University of Saskatchewan.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Observatory_Telescope_at_the_University_of_Saskatchewan.jpg",
+   "author": "SSPWXR",
+   "license": "CC0",
+   "sha256": "b32d6efd8aed81f4177b3c8d069e41866f37efb3100dd20ac01a31075d6af3e4"
+  },
+  "tent.jpg": {
+   "commons_title": "File:Camping tent on tarp.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Camping_tent_on_tarp.jpg",
+   "author": "Eden Aviv",
+   "license": "CC0",
+   "sha256": "4d6c163bbf82952e4f87505a6d00d82a9e4690914cb2b29a4a557ad0f8950b89"
+  },
+  "tractor.jpg": {
+   "commons_title": "File:Farmall 560 tractor VA1.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Farmall_560_tractor_VA1.jpg",
+   "author": "Acroterion",
+   "license": "CC0",
+   "sha256": "1e2d7ba83c7bbf980e99a6e91e5a1214e87ed9b4e6f971ddbd86c031fcc190ae"
+  },
+  "tram.jpg": {
+   "commons_title": "File:Moscow, Shabolovka Street tram parade April 2025 (15).jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Moscow,_Shabolovka_Street_tram_parade_April_2025_(15).jpg",
+   "author": "Retired electrician",
+   "license": "CC0",
+   "sha256": "a382b89f41fabb262bc76bb5ad6a983f192143eaff94f6c4e1907f9e44899a72"
+  },
+  "tulip_field.jpg": {
+   "commons_title": "File:Tulip Field Tulips Red Holland Nature Flowers.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Tulip_Field_Tulips_Red_Holland_Nature_Flowers.jpg",
+   "author": "Filio",
+   "license": "CC0",
+   "sha256": "d1962e5fe4aff2b2ae32ad999a45b446037690883db84f8d7dba77d5151fffd5"
+  },
+  "typewriter.jpg": {
+   "commons_title": "File:Woodstock typewriter, 1940s, daylight.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Woodstock_typewriter,_1940s,_daylight.jpg",
+   "author": "Cbaile19",
+   "license": "CC0",
+   "sha256": "891633e5a49a63fa02ca5435f30cc6404d1f149401cc1f8f4132965849ca5b1b"
+  },
+  "raindrops.jpg": {
+   "commons_title": "File:Rain on a blue umbrella.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Rain_on_a_blue_umbrella.jpg",
+   "author": "CorraleH",
+   "license": "CC0",
+   "sha256": "7172ff55bb7a346e4dc3abdb3428e17251dcee8739fb301110041d1452a04278"
+  },
+  "camera_shelves.jpg": {
+   "commons_title": "File:Vintage camera.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Vintage_camera.jpg",
+   "author": "Pr7013",
+   "license": "CC0",
+   "sha256": "72124c9502b0da5c9cdb0b4f01e52e36289f55e66ace4efecfeda95711c4bcd5"
+  },
+  "violin.jpg": {
+   "commons_title": "File:Ginger Smock's violin, at the Smithsonian.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Ginger_Smock%27s_violin,_at_the_Smithsonian.jpg",
+   "author": "unknown, released with CC0 license by Smithsonian",
+   "license": "CC0",
+   "sha256": "fb30d6790c1b236c0d4b298e56b17e8a9e0be977a203c5a54e392e6e8af46a3d"
+  },
+  "windmill.jpg": {
+   "commons_title": "File:Upminster Windmill in 2021.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Upminster_Windmill_in_2021.jpg",
+   "author": "Mangopie23",
+   "license": "CC0",
+   "sha256": "cb15580df14b04eda6355df4f18245235a2ef12d9de5342db668270e98cc031b"
+  },
+  "drum_kit.jpg": {
+   "commons_title": "File:Electronic drum kit.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Electronic_drum_kit.jpg",
+   "author": "Pxhere.com",
+   "license": "CC0",
+   "sha256": "ce229a3958407688531f64fc0e81ef73c7c225cf2ec8bbdc50221bc8aef5fe68"
+  },
+  "elephant.jpg": {
+   "commons_title": "File:Elephant animal.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Elephant_animal.jpg",
+   "author": "Swethasakthivel",
+   "license": "CC0",
+   "sha256": "d96acfc306d935ab8de5ffedfc739532713ede7da745a94b3a8fb66293a44a9c"
+  },
+  "helicopter.jpg": {
+   "commons_title": "File:Aerotech Sikorsky UH-60A VH-UHG.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Aerotech_Sikorsky_UH-60A_VH-UHG.jpg",
+   "author": "Hallo3800",
+   "license": "CC0",
+   "sha256": "5d7bf535fd98f86c3bdfc4154b91e92b1fcf1d14f84d06e9fa8ff360b644836f"
+  },
+  "horse_statue.jpg": {
+   "commons_title": "File:Eastern Han Bronze Galloping Horse (10094846996).jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Eastern_Han_Bronze_Galloping_Horse_(10094846996).jpg",
+   "author": "Gary Todd from Xinzheng, China",
+   "license": "CC0",
+   "sha256": "047c7b4858e8ed6f5aac5b3934893d688a55d252e7b04317270e3bb07a1cf15e"
+  },
+  "red_barn.jpg": {
+   "commons_title": "File:Red barn in Virginia.jpg",
+   "source_url": "https://commons.wikimedia.org/wiki/File:Red_barn_in_Virginia.jpg",
+   "author": "Packer1028",
+   "license": "CC0",
+   "sha256": "a011aadf9497353b7e07a3a109607203072ac191fc3fb754c140b18ce37bda1d"
+  }
+ }
+}

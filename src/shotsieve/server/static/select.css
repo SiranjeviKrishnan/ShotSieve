@@ -1,0 +1,22 @@
+/* T23i: multi-select cells, batch panel, Move to Trash sheet */
+.cell.msel { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent); outline: 2px solid var(--accent); outline-offset: -2px; }
+.cell.msel::after { content: ""; position: absolute; inset: 0; border-radius: 6px; background: color-mix(in srgb, var(--accent) 16%, transparent); pointer-events: none; }
+.cell .chk { position: absolute; top: 4px; right: 4px; z-index: 2; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 13px; line-height: 20px; text-align: center; font-weight: 700; box-shadow: 0 1px 4px rgba(0,0,0,.5); pointer-events: none; }
+#multi-info { padding: 4px 0; }
+#multi-info[hidden] { display: none; }
+#multi-info h2 { margin: 6px 0 8px; }
+#multi-info .m-sum { margin-bottom: 6px; }
+#multi-info .m-stars { display: flex; gap: 4px; margin: 8px 0; flex-wrap: wrap; }
+#multi-info .m-stars button { padding: 1px 8px; min-height: 24px; }
+#multi-info .m-stars button.on { border-color: var(--accent); background: var(--pressed); }
+#multi-info .m-hint { font-size: 12px; margin: 6px 0; }
+button.danger { border-color: var(--reject); }
+button.danger:hover:not(:disabled) { background: color-mix(in srgb, var(--reject) 22%, transparent); }
+#ctx-menu .ctx-danger { color: var(--reject); }
+#trash-sheet { width: min(480px, 92vw); max-height: 88vh; overflow: auto; }
+#trash-sheet .tr-names { margin: 8px 0; padding-left: 18px; max-height: 140px; overflow: auto; }
+#trash-sheet .tr-opt { display: block; margin: 8px 0; }
+#trash-sheet .tr-note { font-size: 12px; margin: 6px 0; }
+#trash-sheet .tr-warn { color: var(--review); }
+#trash-sheet .tr-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+#toast .toast-act { margin-left: 8px; }

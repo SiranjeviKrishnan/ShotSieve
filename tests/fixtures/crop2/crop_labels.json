@@ -1,0 +1,1457 @@
+{
+ "portrait_01.jpg": {
+  "w": 853,
+  "h": 1280,
+  "subjects": [
+   {
+    "kind": "object",
+    "box_px": [
+     0,
+     95,
+     853,
+     1280
+    ],
+    "must": true
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     205,
+     190,
+     640,
+     745
+    ],
+    "must": true
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "4:5": [
+    0,
+    60,
+    853,
+    1126
+   ],
+   "1:1": [
+    0,
+    50,
+    853,
+    903
+   ]
+  }
+ },
+ "portrait_02.jpg": {
+  "w": 1280,
+  "h": 852,
+  "subjects": [
+   {
+    "kind": "person",
+    "box_px": [
+     0,
+     78,
+     1280,
+     852
+    ],
+    "must": true
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     305,
+     190,
+     768,
+     700
+    ],
+    "must": true
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "3:2": [
+    0,
+    0,
+    1278,
+    852
+   ],
+   "1:1": [
+    90,
+    0,
+    942,
+    852
+   ]
+  }
+ },
+ "portrait_03.jpg": {
+  "w": 1280,
+  "h": 851,
+  "subjects": [
+   {
+    "kind": "person",
+    "box_px": [
+     300,
+     100,
+     1095,
+     851
+    ],
+    "must": true
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     635,
+     250,
+     835,
+     625
+    ],
+    "must": true
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "4:5": [
+    395,
+    0,
+    1075,
+    851
+   ],
+   "1:1": [
+    310,
+    0,
+    1161,
+    851
+   ]
+  }
+ },
+ "portrait_04.jpg": {
+  "w": 853,
+  "h": 1280,
+  "subjects": [
+   {
+    "kind": "person",
+    "box_px": [
+     380,
+     522,
+     735,
+     1200
+    ],
+    "must": true
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     450,
+     565,
+     578,
+     697
+    ],
+    "must": true
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "4:5": [
+    173,
+    420,
+    853,
+    1270
+   ],
+   "1:1": [
+    50,
+    500,
+    750,
+    1200
+   ]
+  }
+ },
+ "portrait_05.jpg": {
+  "w": 1280,
+  "h": 853,
+  "subjects": [
+   {
+    "kind": "person",
+    "box_px": [
+     0,
+     25,
+     915,
+     853
+    ],
+    "must": true
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     510,
+     95,
+     765,
+     420
+    ],
+    "must": true
+   },
+   {
+    "kind": "animal",
+    "box_px": [
+     655,
+     275,
+     1280,
+     853
+    ],
+    "must": true
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {}
+ },
+ "group_01.jpg": {
+  "w": 1280,
+  "h": 905,
+  "subjects": [
+   {
+    "kind": "person",
+    "box_px": [
+     575,
+     342,
+     830,
+     795
+    ],
+    "must": true
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     715,
+     350,
+     775,
+     412
+    ],
+    "must": true
+   },
+   {
+    "kind": "object",
+    "box_px": [
+     642,
+     578,
+     716,
+     650
+    ],
+    "must": true
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     30,
+     328,
+     290,
+     768
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     125,
+     328,
+     180,
+     392
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     513,
+     373,
+     590,
+     615
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     528,
+     375,
+     565,
+     408
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     1172,
+     350,
+     1265,
+     490
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     922,
+     315,
+     1020,
+     450
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     1042,
+     317,
+     1118,
+     448
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     1066,
+     320,
+     1092,
+     355
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     898,
+     250,
+     985,
+     352
+    ],
+    "must": false
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "16:9": [
+    0,
+    185,
+    1280,
+    905
+   ],
+   "4:5": [
+    250,
+    0,
+    974,
+    905
+   ]
+  }
+ },
+ "group_02.jpg": {
+  "w": 1280,
+  "h": 853,
+  "subjects": [
+   {
+    "kind": "person",
+    "box_px": [
+     325,
+     208,
+     790,
+     853
+    ],
+    "must": true
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     470,
+     235,
+     540,
+     345
+    ],
+    "must": true
+   },
+   {
+    "kind": "object",
+    "box_px": [
+     672,
+     312,
+     835,
+     460
+    ],
+    "must": true
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     630,
+     425,
+     1078,
+     853
+    ],
+    "must": true
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     895,
+     338,
+     1130,
+     810
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     968,
+     340,
+     1030,
+     420
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     1085,
+     358,
+     1280,
+     853
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     1195,
+     365,
+     1250,
+     440
+    ],
+    "must": false
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "16:9": [
+    0,
+    133,
+    1280,
+    853
+   ],
+   "3:2": [
+    0,
+    0,
+    1280,
+    853
+   ]
+  }
+ },
+ "group_03.jpg": {
+  "w": 960,
+  "h": 1280,
+  "subjects": [
+   {
+    "kind": "person",
+    "box_px": [
+     425,
+     645,
+     545,
+     790
+    ],
+    "must": true
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     465,
+     655,
+     505,
+     715
+    ],
+    "must": true
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     545,
+     558,
+     695,
+     1085
+    ],
+    "must": true
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     485,
+     700,
+     565,
+     945
+    ],
+    "must": true
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     380,
+     470,
+     465,
+     640
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     400,
+     470,
+     435,
+     510
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     130,
+     360,
+     232,
+     590
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     435,
+     335,
+     487,
+     505
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     450,
+     340,
+     475,
+     372
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     495,
+     340,
+     555,
+     505
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     512,
+     342,
+     537,
+     372
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     560,
+     330,
+     615,
+     510
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     615,
+     355,
+     672,
+     505
+    ],
+    "must": false
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "3:2": [
+    0,
+    500,
+    960,
+    1140
+   ],
+   "1:1": [
+    0,
+    320,
+    960,
+    1280
+   ]
+  }
+ },
+ "group_04.jpg": {
+  "w": 960,
+  "h": 1280,
+  "subjects": [
+   {
+    "kind": "person",
+    "box_px": [
+     445,
+     395,
+     920,
+     1280
+    ],
+    "must": true
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     178,
+     600,
+     255,
+     840
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     385,
+     598,
+     468,
+     848
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     415,
+     605,
+     440,
+     637
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     300,
+     640,
+     350,
+     780
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     0,
+     450,
+     125,
+     1240
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     872,
+     520,
+     960,
+     1280
+    ],
+    "must": false
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "4:5": [
+    190,
+    320,
+    958,
+    1280
+   ],
+   "2:3": [
+    107,
+    0,
+    960,
+    1280
+   ]
+  }
+ },
+ "group_05.jpg": {
+  "w": 1280,
+  "h": 854,
+  "subjects": [
+   {
+    "kind": "person",
+    "box_px": [
+     575,
+     228,
+     943,
+     758
+    ],
+    "must": true
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     665,
+     255,
+     715,
+     310
+    ],
+    "must": true
+   },
+   {
+    "kind": "object",
+    "box_px": [
+     497,
+     368,
+     580,
+     452
+    ],
+    "must": true
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     98,
+     10,
+     330,
+     494
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     135,
+     40,
+     185,
+     90
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     205,
+     0,
+     465,
+     425
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     1065,
+     0,
+     1280,
+     427
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     1122,
+     22,
+     1168,
+     72
+    ],
+    "must": false
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "4:5": [
+    420,
+    0,
+    1103,
+    854
+   ],
+   "16:9": [
+    150,
+    130,
+    1280,
+    766
+   ]
+  }
+ },
+ "group_06.jpg": {
+  "w": 1280,
+  "h": 852,
+  "subjects": [
+   {
+    "kind": "person",
+    "box_px": [
+     588,
+     470,
+     818,
+     752
+    ],
+    "must": true
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     745,
+     475,
+     780,
+     520
+    ],
+    "must": true
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     470,
+     438,
+     637,
+     655
+    ],
+    "must": true
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     595,
+     455,
+     625,
+     500
+    ],
+    "must": true
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     385,
+     425,
+     485,
+     768
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     412,
+     430,
+     440,
+     480
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     318,
+     408,
+     400,
+     690
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     850,
+     462,
+     1050,
+     852
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     1018,
+     198,
+     1092,
+     385
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     1040,
+     200,
+     1070,
+     245
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     1035,
+     510,
+     1165,
+     700
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     1040,
+     515,
+     1085,
+     575
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     1150,
+     430,
+     1280,
+     620
+    ],
+    "must": false
+   },
+   {
+    "kind": "face",
+    "box_px": [
+     1200,
+     432,
+     1250,
+     490
+    ],
+    "must": false
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {}
+ },
+ "animal_01.jpg": {
+  "w": 1280,
+  "h": 853,
+  "subjects": [
+   {
+    "kind": "animal",
+    "box_px": [
+     465,
+     28,
+     830,
+     853
+    ],
+    "must": true
+   },
+   {
+    "kind": "object",
+    "box_px": [
+     150,
+     703,
+     355,
+     853
+    ],
+    "must": false
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "4:5": [
+    330,
+    0,
+    1012,
+    853
+   ],
+   "1:1": [
+    300,
+    0,
+    1153,
+    853
+   ]
+  }
+ },
+ "animal_02.jpg": {
+  "w": 1280,
+  "h": 960,
+  "subjects": [
+   {
+    "kind": "animal",
+    "box_px": [
+     218,
+     333,
+     968,
+     782
+    ],
+    "must": true
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "3:2": [
+    140,
+    260,
+    1040,
+    860
+   ],
+   "16:9": [
+    110,
+    300,
+    1110,
+    862
+   ]
+  }
+ },
+ "animal_03.jpg": {
+  "w": 1280,
+  "h": 853,
+  "subjects": [
+   {
+    "kind": "animal",
+    "box_px": [
+     0,
+     258,
+     1000,
+     853
+    ],
+    "must": true
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "4:5": [
+    330,
+    0,
+    1012,
+    853
+   ],
+   "1:1": [
+    150,
+    0,
+    1003,
+    853
+   ]
+  }
+ },
+ "animal_04.jpg": {
+  "w": 1280,
+  "h": 828,
+  "subjects": [
+   {
+    "kind": "animal",
+    "box_px": [
+     0,
+     80,
+     1153,
+     765
+    ],
+    "must": true
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "16:9": [
+    0,
+    50,
+    1280,
+    770
+   ],
+   "3:2": [
+    0,
+    0,
+    1242,
+    828
+   ]
+  }
+ },
+ "animal_05.jpg": {
+  "w": 1280,
+  "h": 960,
+  "subjects": [
+   {
+    "kind": "animal",
+    "box_px": [
+     215,
+     0,
+     1140,
+     960
+    ],
+    "must": true
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "4:5": [
+    215,
+    0,
+    983,
+    960
+   ],
+   "1:1": [
+    215,
+    0,
+    1175,
+    960
+   ]
+  }
+ },
+ "object_01.jpg": {
+  "w": 960,
+  "h": 1280,
+  "subjects": [
+   {
+    "kind": "object",
+    "box_px": [
+     475,
+     108,
+     598,
+     790
+    ],
+    "must": true
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "4:5": [
+    152,
+    40,
+    920,
+    1000
+   ],
+   "2:3": [
+    216,
+    40,
+    856,
+    1000
+   ]
+  }
+ },
+ "object_02.jpg": {
+  "w": 1280,
+  "h": 853,
+  "subjects": [
+   {
+    "kind": "object",
+    "box_px": [
+     125,
+     78,
+     1100,
+     808
+    ],
+    "must": true
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {}
+ },
+ "object_03.jpg": {
+  "w": 845,
+  "h": 1280,
+  "subjects": [
+   {
+    "kind": "object",
+    "box_px": [
+     203,
+     185,
+     535,
+     965
+    ],
+    "must": true
+   },
+   {
+    "kind": "object",
+    "box_px": [
+     565,
+     848,
+     808,
+     970
+    ],
+    "must": false
+   },
+   {
+    "kind": "object",
+    "box_px": [
+     777,
+     822,
+     830,
+     895
+    ],
+    "must": false
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "4:5": [
+    0,
+    110,
+    845,
+    1166
+   ],
+   "2:3": [
+    100,
+    120,
+    740,
+    1080
+   ]
+  }
+ },
+ "object_04.jpg": {
+  "w": 720,
+  "h": 1280,
+  "subjects": [
+   {
+    "kind": "object",
+    "box_px": [
+     275,
+     165,
+     602,
+     1000
+    ],
+    "must": true
+   },
+   {
+    "kind": "object",
+    "box_px": [
+     190,
+     800,
+     665,
+     1235
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     18,
+     275,
+     48,
+     345
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     55,
+     285,
+     100,
+     375
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     418,
+     222,
+     465,
+     330
+    ],
+    "must": false
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "4:5": [
+    0,
+    130,
+    720,
+    1030
+   ],
+   "2:3": [
+    0,
+    100,
+    720,
+    1180
+   ]
+  }
+ },
+ "object_05.jpg": {
+  "w": 1280,
+  "h": 853,
+  "subjects": [
+   {
+    "kind": "object",
+    "box_px": [
+     853,
+     432,
+     975,
+     757
+    ],
+    "must": true
+   },
+   {
+    "kind": "object",
+    "box_px": [
+     448,
+     92,
+     605,
+     670
+    ],
+    "must": true
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     790,
+     733,
+     813,
+     748
+    ],
+    "must": false
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "16:9": [
+    0,
+    85,
+    1280,
+    805
+   ],
+   "3:2": [
+    0,
+    0,
+    1280,
+    853
+   ]
+  }
+ },
+ "horizon_01.jpg": {
+  "w": 1280,
+  "h": 720,
+  "subjects": [
+   {
+    "kind": "object",
+    "box_px": [
+     603,
+     315,
+     655,
+     484
+    ],
+    "must": true
+   },
+   {
+    "kind": "object",
+    "box_px": [
+     578,
+     333,
+     625,
+     362
+    ],
+    "must": false
+   },
+   {
+    "kind": "person",
+    "box_px": [
+     356,
+     458,
+     368,
+     480
+    ],
+    "must": false
+   }
+  ],
+  "horizon_y_px": 352,
+  "reference_px": {
+   "16:9": [
+    0,
+    0,
+    1280,
+    720
+   ],
+   "3:2": [
+    90,
+    0,
+    1170,
+    720
+   ]
+  }
+ },
+ "horizon_02.jpg": {
+  "w": 1280,
+  "h": 848,
+  "subjects": [
+   {
+    "kind": "object",
+    "box_px": [
+     920,
+     395,
+     1280,
+     418
+    ],
+    "must": false
+   }
+  ],
+  "horizon_y_px": 422,
+  "reference_px": {
+   "16:9": [
+    0,
+    100,
+    1280,
+    820
+   ],
+   "3:2": [
+    0,
+    0,
+    1272,
+    848
+   ]
+  }
+ },
+ "horizon_03.jpg": {
+  "w": 1280,
+  "h": 853,
+  "subjects": [],
+  "horizon_y_px": 498,
+  "reference_px": {
+   "16:9": [
+    0,
+    120,
+    1280,
+    840
+   ],
+   "3:2": [
+    0,
+    0,
+    1280,
+    853
+   ]
+  }
+ },
+ "small_01.jpg": {
+  "w": 1280,
+  "h": 853,
+  "subjects": [
+   {
+    "kind": "animal",
+    "box_px": [
+     200,
+     143,
+     830,
+     400
+    ],
+    "must": true
+   }
+  ],
+  "horizon_y_px": null,
+  "reference_px": {
+   "3:2": [
+    100,
+    40,
+    1000,
+    640
+   ],
+   "16:9": [
+    130,
+    60,
+    1030,
+    566
+   ]
+  }
+ }
+}

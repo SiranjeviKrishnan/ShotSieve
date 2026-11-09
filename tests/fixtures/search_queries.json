@@ -1,0 +1,125 @@
+{
+ "_doc": "30 hand-labelled queries; relevant = source subject (the corpus holds 5 variants of each of 13 subjects, built in tests/test_search_real.py)",
+ "queries": [
+  {
+   "q": "a dog",
+   "relevant": "dog"
+  },
+  {
+   "q": "a white fluffy dog sitting on grass",
+   "relevant": "dog"
+  },
+  {
+   "q": "a red car",
+   "relevant": "red_car"
+  },
+  {
+   "q": "a red sports car parked on the grass",
+   "relevant": "red_car"
+  },
+  {
+   "q": "a Ferrari",
+   "relevant": "red_car"
+  },
+  {
+   "q": "a monkey",
+   "relevant": "baboon"
+  },
+  {
+   "q": "a colorful baboon face",
+   "relevant": "baboon"
+  },
+  {
+   "q": "a butterfly",
+   "relevant": "butterfly"
+  },
+  {
+   "q": "a butterfly on a green leaf",
+   "relevant": "butterfly"
+  },
+  {
+   "q": "a flower",
+   "relevant": "flower"
+  },
+  {
+   "q": "an orange flower",
+   "relevant": "flower"
+  },
+  {
+   "q": "a dahlia",
+   "relevant": "flower"
+  },
+  {
+   "q": "fruit",
+   "relevant": "fruits"
+  },
+  {
+   "q": "sliced oranges and kiwi",
+   "relevant": "fruits"
+  },
+  {
+   "q": "a lemon",
+   "relevant": "fruits"
+  },
+  {
+   "q": "a soccer player kicking a ball",
+   "relevant": "messi5"
+  },
+  {
+   "q": "football match",
+   "relevant": "messi5"
+  },
+  {
+   "q": "a stadium crowd",
+   "relevant": "messi5"
+  },
+  {
+   "q": "a woman in a hat",
+   "relevant": "lena"
+  },
+  {
+   "q": "a portrait of a woman",
+   "relevant": "lena"
+  },
+  {
+   "q": "a modern apartment building",
+   "relevant": "building"
+  },
+  {
+   "q": "a glass and concrete building",
+   "relevant": "building"
+  },
+  {
+   "q": "a bus",
+   "relevant": "bus"
+  },
+  {
+   "q": "people walking next to a blue bus",
+   "relevant": "bus"
+  },
+  {
+   "q": "a pagoda by a lake",
+   "relevant": "china"
+  },
+  {
+   "q": "a chinese temple",
+   "relevant": "china"
+  },
+  {
+   "q": "an old palace under a blue sky",
+   "relevant": "home"
+  },
+  {
+   "q": "a painting of a night sky",
+   "relevant": "starry_night"
+  },
+  {
+   "q": "van gogh",
+   "relevant": "starry_night"
+  },
+  {
+   "q": "a swirling starry sky",
+   "relevant": "starry_night"
+  }
+ ]
+}

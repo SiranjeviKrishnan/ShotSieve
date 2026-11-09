@@ -1,0 +1,127 @@
+{
+ "portrait_01.jpg": {
+  "category": "portrait",
+  "sha256": "94e8d372e3f2eb7c298a2b152f19f8ad734a6ed2d665a7a2d056533517b43bf6",
+  "split": "heldout"
+ },
+ "portrait_02.jpg": {
+  "category": "portrait",
+  "sha256": "9caef862cfc9a7d4531ff303bff91d04963585ddebc2a1ed4797ddb7c4070377",
+  "split": "heldout"
+ },
+ "portrait_03.jpg": {
+  "category": "portrait",
+  "sha256": "472aa3d298f2d852bbe20bc7f888758910740d592cfdd1a2d10a855642820e7b",
+  "split": "heldout"
+ },
+ "portrait_04.jpg": {
+  "category": "portrait",
+  "sha256": "04457809e27a423131943d4771b01206f6d11ec6891b889edb7b03c3257e9c54",
+  "split": "heldout"
+ },
+ "portrait_05.jpg": {
+  "category": "portrait",
+  "sha256": "22d05a5891f6634cbcca101c76c0f91055adac4585d1692bb28afd7dccb2e3f9",
+  "split": "heldout"
+ },
+ "group_01.jpg": {
+  "category": "group",
+  "sha256": "aeab1551105fc692bdbb519b03f690b7fc498e7fc358eec9a1fdb47ff8d5bd0b",
+  "split": "heldout"
+ },
+ "group_02.jpg": {
+  "category": "group",
+  "sha256": "0db72d4a96ef0ea246485bdfb6818714aab19276852d8a4cc875088fde810928",
+  "split": "heldout"
+ },
+ "group_03.jpg": {
+  "category": "group",
+  "sha256": "d1c5fc79ab2b287734134b1df6ec67c338a33cd39d2f666d8a6c0de651675be5",
+  "split": "heldout"
+ },
+ "group_04.jpg": {
+  "category": "group",
+  "sha256": "1a2c4f5ff6082eb3c574110a9b35bcf338608c47a1c3c2875a15cb483a504897",
+  "split": "heldout"
+ },
+ "group_05.jpg": {
+  "category": "group",
+  "sha256": "4050f8754e572dbd650acbf2aabb8042d840f3a79704bce255c34eda63855550",
+  "split": "heldout"
+ },
+ "group_06.jpg": {
+  "category": "group",
+  "sha256": "dbaa6c4acafb5c434cb1f498a56422365a6b73e43442826c118e6f02e5cceae9",
+  "split": "heldout"
+ },
+ "animal_01.jpg": {
+  "category": "animal",
+  "sha256": "204d13d6ab776ded8b2a5da641b834b2065d6ff16cd41ec80e605e53cd68441b",
+  "split": "heldout"
+ },
+ "animal_02.jpg": {
+  "category": "animal",
+  "sha256": "5d7e85158597056de9a44eb818cdb542b719aef2823ae0e87baf731f4e53efd3",
+  "split": "heldout"
+ },
+ "animal_03.jpg": {
+  "category": "animal",
+  "sha256": "d5d57f90b180b61fadb6438addde62ee391a25da334a9ed685f1b192945c2901",
+  "split": "heldout"
+ },
+ "animal_04.jpg": {
+  "category": "animal",
+  "sha256": "066d0322385f8f1b7052e9240710bde0d0c3ecb0340d599f38f61df1bea246f6",
+  "split": "heldout"
+ },
+ "animal_05.jpg": {
+  "category": "animal",
+  "sha256": "c9401d59faf3eab8d7b0a16181df44df05392cd08d787c179c5f4791ce17212a",
+  "split": "heldout"
+ },
+ "object_01.jpg": {
+  "category": "object",
+  "sha256": "7e2e2cd9b00999dd109be3135200a6287b4ea1c42ea4634d8bee0cea3200cebe",
+  "split": "heldout"
+ },
+ "object_02.jpg": {
+  "category": "object",
+  "sha256": "91d0f05bd0e542e47d48bd460be403a0648fa653d385d593319475195fe40a93",
+  "split": "heldout"
+ },
+ "object_03.jpg": {
+  "category": "object",
+  "sha256": "b8dda378ed8eb06a418293e32cebadef12543c9dc3654f207b28360e8d6ba4f5",
+  "split": "heldout"
+ },
+ "object_04.jpg": {
+  "category": "object",
+  "sha256": "321d0228446101d908988fe3a3130bc8ad14765e79cda701fb15b737d3e41492",
+  "split": "heldout"
+ },
+ "object_05.jpg": {
+  "category": "object",
+  "sha256": "f16e22732d6b3cbdaf6400ed8d75d80de1880cfc5aaa1cd6761d0837d76cee29",
+  "split": "heldout"
+ },
+ "horizon_01.jpg": {
+  "category": "horizon",
+  "sha256": "340fb0b010bd11d0a3520916589bf5c1c4e14d61f90c3c334323e8b5004e9313",
+  "split": "heldout"
+ },
+ "horizon_02.jpg": {
+  "category": "horizon",
+  "sha256": "a9f3464d72c5a3d64a6110be334b3eaba280fc9ce8ccd538f555034d96a48e23",
+  "split": "heldout"
+ },
+ "horizon_03.jpg": {
+  "category": "horizon",
+  "sha256": "a82b6234de080ad74b4bfdd0b8a81a0c16a8cbbbf1fef7ebd902023a56c57664",
+  "split": "heldout"
+ },
+ "small_01.jpg": {
+  "category": "small",
+  "sha256": "e123632565071e4c1edc39bd68450a76daa3575bc429c40f52dd73b0e7e67908",
+  "split": "heldout"
+ }
+}

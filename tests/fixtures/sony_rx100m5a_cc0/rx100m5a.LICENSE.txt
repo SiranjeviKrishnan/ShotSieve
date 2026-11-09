@@ -1,0 +1,12 @@
+rx100m5a.head.arw: the first 524288 bytes (512 KB) of
+  https://raw.pixls.us/data/Sony/DSC-RX100M5A/20181014_0082.ARW   (Sony DSC-RX100M5A, downloaded 2026-11-08)
+Licence: CC0 1.0 / public domain. raw.pixls.us only accepts samples whose uploader declares: "I hereby release it under
+the cc0 license into the public domain" (upload form text, https://raw.pixls.us/).
+sha256 of the 512 KB head as stored: e41986b3ecda1b01b1c57f517f6c6956a2fbabbeaab1b9adfbef1a8b75c4963b
+Hand-decoded maker note (TIFF -> ExifIFD 0x8769 -> MakerNote 0x927C @5092 -> tag 0x2027 FocusLocation @7148,
+4 x uint16, little endian): [5472, 3648, 1872, 2424] = W, H, X, Y; EXIF Orientation = 1.
+The file is data only; it is parsed by tests/test_makernotes.py, never executed.
+Licence evidence (Review #9 m3): raw.pixls.us hosts samples under several licences, so the upload-form text alone is not
+proof. The per-sample licence column of the repository listing (https://raw.pixls.us/json/getrepository.php?set=all,
+checked 2026-11-08) gives the only DSC-RX100M5A sample (uploaded 2018-10-16, the file above) as CC0.
+sha256 of the FULL source file 20181014_0082.ARW: 2d0e47c9003590f2d817f9054f3988b32457a93a645156e288127d5c5988f3d5

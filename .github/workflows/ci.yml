@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: macos-14   # Apple Silicon (arm64)
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Install (locked, with dev tools)
+        run: uv sync --frozen
+
+      - name: Cache core models (131 MB)
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: models
+          key: models-core-${{ hashFiles('src/shotsieve/models/registry.py') }}
+
+      - name: Fetch core models (pinned URLs, sha256-verified)
+        run: uv run python scripts/fetch_models.py --core
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Privacy check (nothing personal in tracked files)
+        run: bash scripts/privacy_check.sh
+
+      - name: Third-party notices are up to date
+        run: uv run python scripts/gen_third_party.py --check
+
+      - name: Fast tests (no large models, no browser, no installer)
+        run: >
+          uv run pytest -q -p no:cacheprovider
+          -m "not models and not network and not ui and not install and not release and not large"
+          --basetemp=.pytest_tmp_ci

@@ -1,0 +1,14 @@
+closed_eyes.jpg  (downscaled to 664x1024 JPEG q90 from the 1024-px Commons thumbnail; used only by tests/test_video.py)
+Title:    File:Closed Eyes (Unsplash).jpg
+Page:     https://commons.wikimedia.org/wiki/File:Closed_Eyes_(Unsplash).jpg
+Original: https://upload.wikimedia.org/wikipedia/commons/3/35/Closed_Eyes_%28Unsplash%29.jpg (2116x3265, Commons sha1 ecd2f24b0d304889c486189755c4ebc8ec9d2fdb)
+Author:   Toa Heftiba (https://unsplash.com/photos/2O1EUSTRBrY)
+Licence:  CC0 1.0 Universal Public Domain Dedication (http://creativecommons.org/publicdomain/zero/1.0/deed.en),
+          verified through the Commons API extmetadata, 2026-11-08
+sha256 of the downloaded 1024-px thumbnail: 4d41ce444baaa9470c2273a748f1ad3a0f48c204c10eb295a0b67ce10aa03e49
+sha256 of closed_eyes.jpg (as stored):      2fe2bbb576a55e2655ff814751ab3b125bc95062ceaad66ebc73b0d55f71820d
+The real landmarker reads it as eyes closed (blink L 0.74 / R 0.71). The file is data only; nothing from the download is executed.
+Licence evidence (Review #9 m3): the photo was published on Unsplash on 2017-04-20 (EXIF date 2017-04-14), i.e. BEFORE
+Unsplash's licence change of 2017-06-05, so the CC0 dedication it was published under stays valid. Commons records it as
+CC0 1.0; it still carries the maintenance tag "Images from Unsplash (review needed)", which is a Commons housekeeping
+flag, not a licence dispute. Fake `exiftool` helpers elsewhere in the tests are our own code.

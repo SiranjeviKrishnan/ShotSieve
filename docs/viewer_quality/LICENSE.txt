@@ -1,0 +1,8 @@
+The *_pentax.png images in this folder are screenshots / crops of the loupe rendering of one photo:
+the Pentax K-x DNG fixture that scripts/make_fixtures.py downloads into tests/fixtures/generated/raw/
+(not committed):
+  https://raw.pixls.us/data/Pentax/K-x/IMGP6431.DNG   (Pentax K-x, "12bit (3:2)" sample, uploaded 2017-01-12)
+  sha256 of the source file: 7a594b66b54f99bb5aba4627c78abfc41213d6911ea54e4f5d2dd6c8505f6968
+Licence: CC0 1.0 / public domain (raw.pixls.us per-sample licence column, "Creative Commons 0 - Public
+Domain", checked 2026-11-09). before.json / after.json are measurements made by
+scripts/viewer_quality_report.py on that file.

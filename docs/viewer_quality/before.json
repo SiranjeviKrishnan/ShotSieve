@@ -1,0 +1,282 @@
+[
+ {
+  "file": "iphone_like_p3.heic",
+  "geometry": "3440x1440@1x",
+  "dpr": 1,
+  "served_px": [
+   1143,
+   1600
+  ],
+  "displayed_device_px": [
+   970,
+   1358
+  ],
+  "upscale_factor": 0.849,
+  "served_url": "/api/preview/6",
+  "served_bytes": 263856,
+  "jpeg_quality": 88,
+  "icc": "none",
+  "sharp_loupe": 67.919,
+  "sharp_embedded_ref": 148.116,
+  "sharp_sips_ref": 148.202,
+  "sharp_ratio_vs_sips": 0.458,
+  "sharp_ratio_vs_embedded": 0.459,
+  "dE2000_loupe_vs_sips": 2.374,
+  "dE2000_loupe_vs_embedded": 2.385,
+  "dE2000_embedded_vs_sips": 0.757,
+  "aspect_loupe": 0.7143,
+  "aspect_sips": 0.7142
+ },
+ {
+  "file": "pentax.dng",
+  "geometry": "3440x1440@1x",
+  "dpr": 1,
+  "served_px": [
+   1600,
+   1063
+  ],
+  "displayed_device_px": [
+   2044,
+   1358
+  ],
+  "upscale_factor": 1.278,
+  "served_url": "/api/preview/1",
+  "served_bytes": 204246,
+  "jpeg_quality": 88,
+  "icc": "none",
+  "sharp_loupe": 4.198,
+  "sharp_embedded_ref": 27.103,
+  "sharp_sips_ref": 45.128,
+  "sharp_ratio_vs_sips": 0.093,
+  "sharp_ratio_vs_embedded": 0.155,
+  "dE2000_loupe_vs_sips": 3.223,
+  "dE2000_loupe_vs_embedded": 0.887,
+  "dE2000_embedded_vs_sips": 3.275,
+  "aspect_loupe": 1.5052,
+  "aspect_sips": 1.5056
+ },
+ {
+  "file": "portrait_p3.jpg",
+  "geometry": "3440x1440@1x",
+  "dpr": 1,
+  "served_px": [
+   1143,
+   1600
+  ],
+  "displayed_device_px": [
+   970,
+   1358
+  ],
+  "upscale_factor": 0.849,
+  "served_url": "/api/preview/2",
+  "served_bytes": 248973,
+  "jpeg_quality": 88,
+  "icc": "none",
+  "sharp_loupe": 49.215,
+  "sharp_embedded_ref": 160.536,
+  "sharp_sips_ref": 160.349,
+  "sharp_ratio_vs_sips": 0.307,
+  "sharp_ratio_vs_embedded": 0.307,
+  "dE2000_loupe_vs_sips": 2.498,
+  "dE2000_loupe_vs_embedded": 2.489,
+  "dE2000_embedded_vs_sips": 0.162,
+  "aspect_loupe": 0.7143,
+  "aspect_sips": 0.7143
+ },
+ {
+  "file": "portrait_srgb.jpg",
+  "geometry": "3440x1440@1x",
+  "dpr": 1,
+  "served_px": [
+   1143,
+   1600
+  ],
+  "displayed_device_px": [
+   970,
+   1358
+  ],
+  "upscale_factor": 0.849,
+  "served_url": "/api/preview/3",
+  "served_bytes": 251622,
+  "jpeg_quality": 88,
+  "icc": "none",
+  "sharp_loupe": 45.873,
+  "sharp_embedded_ref": 159.772,
+  "sharp_sips_ref": 159.673,
+  "sharp_ratio_vs_sips": 0.287,
+  "sharp_ratio_vs_embedded": 0.287,
+  "dE2000_loupe_vs_sips": 1.844,
+  "dE2000_loupe_vs_embedded": 1.842,
+  "dE2000_embedded_vs_sips": 0.106,
+  "aspect_loupe": 0.7143,
+  "aspect_sips": 0.7143
+ },
+ {
+  "file": "sony_arw16x9.ARW",
+  "geometry": "3440x1440@1x",
+  "dpr": 1,
+  "served_px": [
+   1600,
+   900
+  ],
+  "displayed_device_px": [
+   2414,
+   1358
+  ],
+  "upscale_factor": 1.509,
+  "served_url": "/api/preview/5",
+  "served_bytes": 77362,
+  "jpeg_quality": 88,
+  "icc": "none",
+  "sharp_loupe": 1.524,
+  "sharp_embedded_ref": 5.533,
+  "sharp_sips_ref": 15.858,
+  "sharp_ratio_vs_sips": 0.096,
+  "sharp_ratio_vs_embedded": 0.276,
+  "dE2000_loupe_vs_sips": 3.88,
+  "dE2000_loupe_vs_embedded": 0.54,
+  "dE2000_embedded_vs_sips": 4.051,
+  "aspect_loupe": 1.7776,
+  "aspect_sips": 1.5
+ },
+ {
+  "file": "iphone_like_p3.heic",
+  "geometry": "1728x1117@2x",
+  "dpr": 2,
+  "served_px": [
+   1143,
+   1600
+  ],
+  "displayed_device_px": [
+   1478,
+   2070
+  ],
+  "upscale_factor": 1.294,
+  "served_url": "/api/preview/6",
+  "served_bytes": 263856,
+  "jpeg_quality": 88,
+  "icc": "none",
+  "sharp_loupe": 25.106,
+  "sharp_embedded_ref": 200.631,
+  "sharp_sips_ref": 200.92,
+  "sharp_ratio_vs_sips": 0.125,
+  "sharp_ratio_vs_embedded": 0.125,
+  "dE2000_loupe_vs_sips": 2.595,
+  "dE2000_loupe_vs_embedded": 2.625,
+  "dE2000_embedded_vs_sips": 0.852,
+  "aspect_loupe": 0.714,
+  "aspect_sips": 0.7142
+ },
+ {
+  "file": "pentax.dng",
+  "geometry": "1728x1117@2x",
+  "dpr": 2,
+  "served_px": [
+   1600,
+   1063
+  ],
+  "displayed_device_px": [
+   3114,
+   2070
+  ],
+  "upscale_factor": 1.947,
+  "served_url": "/api/preview/1",
+  "served_bytes": 204246,
+  "jpeg_quality": 88,
+  "icc": "none",
+  "sharp_loupe": 2.224,
+  "sharp_embedded_ref": 18.942,
+  "sharp_sips_ref": 36.523,
+  "sharp_ratio_vs_sips": 0.061,
+  "sharp_ratio_vs_embedded": 0.117,
+  "dE2000_loupe_vs_sips": 3.28,
+  "dE2000_loupe_vs_embedded": 0.993,
+  "dE2000_embedded_vs_sips": 3.297,
+  "aspect_loupe": 1.5043,
+  "aspect_sips": 1.5056
+ },
+ {
+  "file": "portrait_p3.jpg",
+  "geometry": "1728x1117@2x",
+  "dpr": 2,
+  "served_px": [
+   1143,
+   1600
+  ],
+  "displayed_device_px": [
+   1478,
+   2070
+  ],
+  "upscale_factor": 1.294,
+  "served_url": "/api/preview/2",
+  "served_bytes": 248973,
+  "jpeg_quality": 88,
+  "icc": "none",
+  "sharp_loupe": 17.062,
+  "sharp_embedded_ref": 242.865,
+  "sharp_sips_ref": 242.45,
+  "sharp_ratio_vs_sips": 0.07,
+  "sharp_ratio_vs_embedded": 0.07,
+  "dE2000_loupe_vs_sips": 2.783,
+  "dE2000_loupe_vs_embedded": 2.77,
+  "dE2000_embedded_vs_sips": 0.193,
+  "aspect_loupe": 0.714,
+  "aspect_sips": 0.7143
+ },
+ {
+  "file": "portrait_srgb.jpg",
+  "geometry": "1728x1117@2x",
+  "dpr": 2,
+  "served_px": [
+   1143,
+   1600
+  ],
+  "displayed_device_px": [
+   1478,
+   2070
+  ],
+  "upscale_factor": 1.294,
+  "served_url": "/api/preview/3",
+  "served_bytes": 251622,
+  "jpeg_quality": 88,
+  "icc": "none",
+  "sharp_loupe": 15.7,
+  "sharp_embedded_ref": 240.173,
+  "sharp_sips_ref": 239.985,
+  "sharp_ratio_vs_sips": 0.065,
+  "sharp_ratio_vs_embedded": 0.065,
+  "dE2000_loupe_vs_sips": 2.222,
+  "dE2000_loupe_vs_embedded": 2.22,
+  "dE2000_embedded_vs_sips": 0.122,
+  "aspect_loupe": 0.714,
+  "aspect_sips": 0.7143
+ },
+ {
+  "file": "sony_arw16x9.ARW",
+  "geometry": "1728x1117@2x",
+  "dpr": 2,
+  "served_px": [
+   1600,
+   900
+  ],
+  "displayed_device_px": [
+   3400,
+   1912
+  ],
+  "upscale_factor": 2.125,
+  "served_url": "/api/preview/5",
+  "served_bytes": 77362,
+  "jpeg_quality": 88,
+  "icc": "none",
+  "sharp_loupe": 0.981,
+  "sharp_embedded_ref": 2.69,
+  "sharp_sips_ref": 20.899,
+  "sharp_ratio_vs_sips": 0.047,
+  "sharp_ratio_vs_embedded": 0.365,
+  "dE2000_loupe_vs_sips": 3.884,
+  "dE2000_loupe_vs_embedded": 0.542,
+  "dE2000_embedded_vs_sips": 4.055,
+  "aspect_loupe": 1.7782,
+  "aspect_sips": 1.5
+ }
+]

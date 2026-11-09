@@ -1,0 +1,84 @@
+name: Release
+
+# Push a tag such as v0.1.0 (it must match `version` in pyproject.toml) to build the .dmg and
+# attach it, with its sha256 and the GPL/LGPL corresponding-source archive, to the GitHub Release
+# of that tag. This workflow is the only thing that publishes release assets: do not also upload a
+# locally built .dmg of the same name (see CONTRIBUTING.md, "Releasing").
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  dmg:
+    runs-on: macos-14   # Apple Silicon (arm64)
+    timeout-minutes: 90
+    steps:
+      - name: Free disk space and check that at least 10 GB are available
+        run: |
+          # peak need: venv + models + the app in the work folder + dist + dmg staging + rw.dmg + dmg
+          df -g / | tail -1
+          sudo rm -rf /Users/runner/Library/Android /Users/runner/.dotnet /Users/runner/hostedtoolcache/* \
+            /Library/Developer/CoreSimulator /Users/runner/Library/Developer/CoreSimulator 2>/dev/null || true
+          cur="$(xcode-select -p | sed 's|/Contents/Developer.*||')"
+          for x in /Applications/Xcode_*.app; do
+            [ "$x" = "$cur" ] || [ "$(readlink "/Applications/Xcode.app" 2>/dev/null)" = "$x" ] || sudo rm -rf "$x" 2>/dev/null || true
+          done
+          avail="$(df -g / | awk 'NR==2 {print $4}')"
+          echo "free space: ${avail} GB"
+          [ "$avail" -ge 10 ] || { echo "less than 10 GB free: the build would run out of disk" >&2; exit 1; }
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Tag matches the project version
+        run: |
+          v="$(sed -n 's/^version *= *"\(.*\)"/\1/p' pyproject.toml | head -1)"
+          [ "v$v" = "${GITHUB_REF_NAME}" ] || { echo "tag ${GITHUB_REF_NAME} != pyproject version v$v" >&2; exit 1; }
+
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Install
+        run: uv sync --frozen
+
+      - name: Privacy check
+        run: bash scripts/privacy_check.sh
+
+      - name: Cache models
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: models
+          key: models-${{ hashFiles('src/shotsieve/models/registry.py') }}
+
+      - name: Fetch models (pinned URLs, sha256-verified)
+        run: uv run python scripts/fetch_models.py
+
+      - name: Build ShotSieve.app and the .dmg
+        run: bash scripts/build_release.sh
+
+      - name: Corresponding source (GPL / LGPL / MPL components)
+        run: bash scripts/make_gpl_sources.sh
+
+      - name: Check the bundle (offline app tests need a desktop session; the structural ones do not)
+        run: >
+          uv run pytest -q -m release --basetemp=.pytest_tmp_rel
+          -k "self_contained or pinned_sha256"
+
+      - name: Publish
+        uses: softprops/action-gh-release@1853d73993c8ca1b2c9c1a7fede39682d0ab5c2a # v2.5.3
+        with:
+          files: |
+            dist/ShotSieve-*-arm64.dmg
+            dist/ShotSieve-*-arm64.dmg.sha256
+            dist/ShotSieve-*-gpl-sources.tar.gz
+            dist/ShotSieve-*-gpl-sources.tar.gz.sha256
+          generate_release_notes: true
+          body: |
+            The `.dmg` bundles GPL/LGPL components (FFmpeg, x264, x265, ...). Their complete
+            corresponding source is attached to this release as `ShotSieve-<version>-gpl-sources.tar.gz`;
+            see THIRD_PARTY_NOTICES.md. First open of the unsigned app: see the README.
+          fail_on_unmatched_files: true

@@ -1,0 +1,32 @@
+{
+ "_doc": "T17 held-out set (Review #6 M7), written BEFORE scoring and never used to fit TAU. Present items describe the 3 CC0 football photos in tests/fixtures/real/ (cc0_football_*.jpg, not in the bench); absent items describe nothing in the 13-subject search corpus or the football photos. Scored on corpus = 13 search subjects + the 3 football photos (5 variants each).",
+ "present": [
+  "an american football player running on a grass field",
+  "a football player wearing a red jersey with the number 18",
+  "a player in a red helmet and red jersey",
+  "a football player wearing a black helmet and a white jersey",
+  "an athlete in a numbered jersey",
+  "a football practice on a grass field",
+  "a football helmet with a face mask",
+  "a player with long dreadlocks wearing a red jersey",
+  "a man holding a football",
+  "football players in red uniforms",
+  "a player in white pants and a red helmet",
+  "a coach in a black shirt and a white visor"
+ ],
+ "absent": [
+  "a plate of spaghetti with tomato sauce",
+  "a snow covered mountain at sunrise",
+  "a bride in a white wedding dress",
+  "a bowl of ramen noodles",
+  "a violin on a wooden table",
+  "a city skyline at night",
+  "a child blowing out birthday candles",
+  "an elephant walking in the savannah",
+  "a stack of books in a library",
+  "a cup of coffee with latte art",
+  "a hot air balloon over green fields",
+  "a guitarist performing on a stage"
+ ],
+ "_note": "BURNED SET (Review #7 N1). Original labels restored. First scoring: 23/24 = 0.958, false-covered 1/12 = 8.3 % ('a city skyline at night' matched building.jpg, a daytime close-up of a building facade in the corpus: a real near-miss false-covered, not a labelling error). It was once relabelled to 'a bowl of cereal with milk' after scoring; that relabel was reverted. This set is no longer evidence for the T17 out-of-sample claim; the blind set tests/fixtures/shotlist_blind_labels.json is."
+}
