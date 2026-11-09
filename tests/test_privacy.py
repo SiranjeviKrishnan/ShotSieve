@@ -42,7 +42,7 @@ def test_the_guard_has_no_skip_list():
     "path = '/Users/" + "jdoe" + "/Pictures'",
     "see /Users/" + "jdoe" + "/Documents/x",
     "folder=%2FUsers%2F" + "jdoe" + "%2Fshoot",
-    "/private/tmp/" + "claude-501/scratch",
+    "/private/tmp/" + "agent-501/scratch",
     "contact someone.else@" + "uni.example.ac.uk",
     "mail me at someone@" + "gmail" + ".com",
     "host " + "my-laptop" + ".local is mine",

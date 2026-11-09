@@ -44,6 +44,6 @@ jobs:
 
       - name: Fast tests (no large models, no browser, no installer)
         run: >
-          uv run pytest -q -p no:cacheprovider
+          uv run pytest -vv --tb=short -p no:cacheprovider
           -m "not models and not network and not ui and not install and not release and not large"
           --basetemp=.pytest_tmp_ci

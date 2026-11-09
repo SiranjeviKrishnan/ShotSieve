@@ -44,7 +44,7 @@ MAIL_OK = r"(?:users\.noreply\.github\.com|noreply\.github\.com|example\.(?:com|
 PATTERNS = [
     ("absolute home path", rb"/Users/(?!" + PLACEHOLDER.encode() + rb")[A-Za-z0-9._-]+"),
     ("absolute home path (url-encoded)", rb"%2FUsers%2F(?!" + PLACEHOLDER.encode() + rb")[A-Za-z0-9._-]+"),
-    ("local scratch path", rb"(?i)/private/tmp/clau" rb"de-|%2Fprivate%2Ftmp%2Fclau" rb"de-"),
+    ("local scratch path", rb"(?i)/private/tmp/[a-z]+-[0-9]+/|%2Fprivate%2Ftmp%2F[a-z]+-[0-9]+%2F"),
     ("e-mail address", rb"(?i)[A-Za-z0-9._%+-]+@(?!" + MAIL_OK.encode() + rb")[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}\b"),
     ("machine name (.local host)", rb"(?i)\b[A-Za-z0-9][A-Za-z0-9-]*\.local\b(?![A-Za-z0-9_/-])"),
     ("another company's product", rb"(?i)after[ _-]?shoot"),

@@ -364,17 +364,31 @@ def test_cli_detect_fills_the_cache(shoot, ids, tmp_path, monkeypatch, capsys):
         assert c.get_subjects(str(shoot / "two.jpg")) is not None
 
 
-def test_edit_apply_is_not_blocked_by_a_crop_only_sidecar(client, shoot, ids, edit_env):
-    """The T15/T22 interaction on the real `edit apply` path: crop first, edit second."""
+def test_edit_apply_is_not_blocked_by_a_crop_only_sidecar(client, shoot, ids, edit_env, monkeypatch):
+    """The T15/T22 interaction on the real `edit apply` path: crop first, edit second.
+
+    About crop + edit, not prediction quality: the learned profile gates sliders by confidence and
+    out-of-distribution distance, which varies with the execution provider (CoreML vs CPU), so the
+    prediction is pinned to a fixed, writable one.
+    """
     from shotsieve.pipeline import edit
 
+    fixed = {"Exposure2012": 0.4, "Contrast2012": 10.0}
+
+    def fake_predict(paths, profile, settings=None, progress=None, **kw):
+        return {p: edit.ImageEdit(p, dict(fixed), point=dict(fixed)) for p in paths}
+
+    monkeypatch.setattr(edit, "predict_paths", fake_predict)
     i = ids["frame.pef"]
     assert client.post(f"/api/crop/{i}/accept", json={"rect": [0.1, 0.1, 0.9, 0.9], "ratio": "free"}).json()["write"]["status"] == "written"
     cur = crs.read_develop_xmp(shoot / "frame.pef")
     assert cur.only_ours and cur.has_settings and not cur.ours
     ok, why = crs.writable(shoot / "frame.pef", "sidecar")
     assert ok, why
+    assert edit._mode_for(str(shoot / "frame.pef"), False) == "sidecar"
     res = edit.apply_folder(shoot, Settings(), scope="all", ids=[i])
+    assert res["predicted"] == 1 and res["diff"][0]["values"] == fixed, res
+    assert res["diff"][0]["status"] == "written", res
     assert res["written_sidecar"] == 1 and not res["skipped"], res
     cur = crs.read_develop_xmp(shoot / "frame.pef")
     assert cur.ours and cur.crop_ours and float(cur.raw["CropLeft"]) == pytest.approx(0.1, abs=1e-3)
