@@ -12,7 +12,11 @@ under `<shoot>/.shotsieve/denoise/`.
 * **Basic** (no model, or CoreML/ORT failing): `cv2.fastNlMeansDenoisingColored` per tile with a
   strength scaled to the noise estimated from the image (and its ISO).
 * Strength Low / Medium / High: AI blends the model output with the input (residual scaling),
-  scaled by the estimated noise so a clean image is barely touched; Basic scales NLM's `h`.
+  scaled by the estimated noise so a clean image is barely touched; Basic scales NLM's `h`. The
+  blend is split into luma and chroma (v2): the level and the noise scale the LUMA residual (that is
+  where "plastic" comes from), the chroma residual is taken (almost) fully, because colour mottling
+  is what a half-strength blend leaves behind. The noise level is one number per photo, measured on
+  the full-resolution pixels (multi-scale, ISO-bounded) and used by Fit, region and full alike.
 """
 
 from __future__ import annotations
@@ -38,7 +42,12 @@ log = get_logger("denoise")
 TILE = 256  # the model's fixed input size
 MARGIN = 16  # px of each tile discarded in favour of its neighbour (feathered)
 LEVELS = ("low", "medium", "high")
-AI_ALPHA = {"low": 0.45, "medium": 0.75, "high": 1.0}  # blend towards the model output
+VERSION = 2  # cache key of the denoised JPEGs: bump when the look of a result changes
+AI_ALPHA = {"low": 0.5, "medium": 0.8, "high": 1.0}  # luma blend towards the model output
+AI_CHROMA = {"low": 0.9, "medium": 1.0, "high": 1.0}  # chroma blend (colour noise is not detail)
+SIGMA_REF = 6.0  # noise level (8-bit) at which the full level strength is used
+NOISY_FLOOR = 0.5  # share of the level kept once there is visible noise (sigma >= 3)
+CLEAN_FLOOR = 0.25  # ... and on a clean image (sigma <= 1.5); in between it is interpolated
 NLM_K = {"low": 0.7, "medium": 1.0, "high": 1.4}  # NLM h = k * estimated sigma
 WORKERS = 3  # tiles in flight: ~30 % faster than 1 on the M1 Pro (CoreML queues them)
 IDLE_S = 60.0
@@ -61,18 +70,28 @@ def available() -> bool:
 _LAP = np.array([[1, -2, 1], [-2, 4, -2], [1, -2, 1]], np.float32)
 
 
-def estimate_sigma(rgb: np.ndarray) -> float:
-    """Noise standard deviation in 8-bit levels: median of the Immerkaer (1996) response on the
-    luma of up to ~2 MP of the image, which stays robust to edges and texture. Typical: ISO 100 low
-    noise ~ 0.8, ISO 1600 ~ 3, ISO 12800 ~ 9."""
+def _immerkaer(luma: np.ndarray) -> float:
+    r = np.abs(cv2.filter2D(luma, -1, _LAP))[2:-2, 2:-2]
+    return 0.0 if r.size == 0 else float(np.median(r) / (0.6745 * 6.0))
+
+
+def estimate_sigma(rgb: np.ndarray, coarse: float = 1.0) -> float:
+    """Noise standard deviation in 8-bit levels, from the median of the Immerkaer (1996) response
+    on the luma of up to ~2 MP (robust to edges and texture), at two scales. Demosaiced / JPEG'd
+    noise is spatially correlated and the pixel-scale Laplacian under-reads it; after a 2x2 box
+    average (white noise drops by exactly 2, correlated noise by less) the same estimate times 2 is
+    far closer, so the larger of the two is used (`coarse` 0..1 takes that share of the gap: a
+    sharp, textured scene also reads high at the coarse scale, so without an ISO to bound it
+    `effective_sigma` takes half). Typical: ISO 100 ~ 0.8, ISO 1600 ~ 3, ISO 12800 ~ 9."""
     h, w = rgb.shape[:2]
     step = max(1, int(np.sqrt(h * w / 2_000_000)))
     sub = rgb[::step, ::step] if step > 1 else rgb
     luma = cv2.cvtColor(sub, cv2.COLOR_RGB2GRAY).astype(np.float32)
-    r = np.abs(cv2.filter2D(luma, -1, _LAP))[2:-2, 2:-2]
-    if r.size == 0:
-        return 0.0
-    return float(np.median(r) / (0.6745 * 6.0))
+    s1 = _immerkaer(luma)
+    if min(luma.shape) < 32:
+        return s1
+    half = cv2.resize(luma, (luma.shape[1] // 2, luma.shape[0] // 2), interpolation=cv2.INTER_AREA)
+    return s1 + coarse * max(0.0, 2.0 * _immerkaer(half) - s1)
 
 
 def prior_sigma(iso: int | None) -> float | None:
@@ -80,13 +99,13 @@ def prior_sigma(iso: int | None) -> float | None:
 
 
 def effective_sigma(rgb: np.ndarray, iso: int | None = None) -> float:
-    """The noise level used for strength scaling: the image estimate kept within 0.5x..2.5x of what
+    """The noise level used for strength scaling: the image estimate kept within 0.5x..1.8x of what
     the ISO predicts (a textured scene fools the estimate upwards, a smooth one downwards)."""
-    est = estimate_sigma(rgb)
     prior = prior_sigma(iso)
     if prior is None:
-        return max(est, 0.3)
-    return float(np.clip(est, 0.5 * prior, 2.5 * prior))
+        return max(estimate_sigma(rgb, 0.5), 0.3)
+    est = estimate_sigma(rgb)
+    return float(np.clip(est, 0.5 * prior, 1.8 * prior))
 
 
 # ---- tiling ----------------------------------------------------------------
@@ -249,9 +268,34 @@ def loaded() -> bool:
 # ---- strength --------------------------------------------------------------
 
 
+def strength_scale(sigma: float) -> float:
+    """0.25..1: how much of the level applies at this noise. A clean image (sigma <= 1.5) keeps a
+    quarter, anything visibly noisy (sigma >= 3) at least half, full strength from SIGMA_REF."""
+    k = float(np.clip((sigma - 1.5) / 1.5, 0.0, 1.0))
+    floor = CLEAN_FLOOR + (NOISY_FLOOR - CLEAN_FLOOR) * k
+    return float(np.clip(sigma / SIGMA_REF, floor, 1.0))
+
+
 def ai_alpha(level: str, sigma: float) -> float:
-    """Share of the model output mixed into the image: the level, scaled down for a clean image."""
-    return float(AI_ALPHA[level] * np.clip(sigma / 5.0, 0.25, 1.0))
+    """Share of the model's LUMA output mixed into the image."""
+    return float(AI_ALPHA[level] * strength_scale(sigma))
+
+
+def ai_chroma_alpha(level: str, sigma: float) -> float:
+    """Share of the model's chroma output: colour noise goes (nearly) fully at every level once
+    there is visible noise (sigma >= 3.5); a clean image keeps most of its own chroma."""
+    return float(AI_CHROMA[level] * (0.3 + 0.7 * np.clip((sigma - 1.5) / 2.0, 0.0, 1.0)))
+
+
+_LUMA = np.array([0.299, 0.587, 0.114], np.float32)
+
+
+def blend_luma_chroma(t: np.ndarray, y: np.ndarray, a_luma: float, a_chroma: float) -> np.ndarray:
+    """`t` + the model's change `y - t`, its luma part scaled by `a_luma` and the chroma part (what
+    is left of the change once the luma part is taken out) by `a_chroma`. float32 in and out."""
+    d = y - t
+    dl = (d @ _LUMA)[..., None]
+    return t + a_luma * dl + a_chroma * (d - dl)
 
 
 def nlm_strength(level: str, sigma: float) -> float:
@@ -282,11 +326,10 @@ def denoise(
     if backend in (None, "ai") and available():
         try:
             with holder().use() as net:
-                alpha = ai_alpha(level, sig)
+                a_l, a_c = ai_alpha(level, sig), ai_chroma_alpha(level, sig)
 
                 def run(t: np.ndarray) -> np.ndarray:
-                    y = net.tile(t)
-                    return t.astype(np.float32) + alpha * (y - t.astype(np.float32))
+                    return blend_luma_chroma(t.astype(np.float32), net.tile(t), a_l, a_c)
 
                 return run_tiled(rgb, run, WORKERS if net.provider == "coreml" else 1,
                                  pause, cancel, progress), "ai"  # fmt: skip
@@ -304,6 +347,20 @@ def denoise(
         return cv2.cvtColor(y, cv2.COLOR_BGR2RGB).astype(np.float32)
 
     return run_tiled(rgb, basic, 2, pause, cancel, progress), "basic"
+
+
+def warm() -> bool:
+    """Load the model and run one tiny tile so CoreML compiles now (a first press of D otherwise
+    waits 5-50 s). The session still idle-unloads after IDLE_S. False when there is no model."""
+    if not available():
+        return False
+    try:
+        with holder().use() as net:
+            net.tile(np.zeros((TILE, TILE, 3), np.uint8))
+        return True
+    except Exception as exc:  # noqa: BLE001
+        log.warning("denoise warm-up failed: %s", exc)
+        return False
 
 
 def timed(fn: Callable[[], object]) -> tuple[object, float]:

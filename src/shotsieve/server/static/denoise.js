@@ -27,24 +27,39 @@
     return status;
   }
 
+  /* The first press of D waits seconds for the model to compile: opening the loupe / compare asks
+     the server to warm it in the background (it ignores that while a cull runs). */
+  let warmedAt = 0;
+  function warm() {
+    if (Date.now() - warmedAt < 20000) return;
+    warmedAt = Date.now();
+    loadStatus().then((st) => {
+      if (st && st.model && st.model.installed) fetch("/api/denoise/warm", { method: "POST" }).catch(() => {});
+    });
+  }
+
   /* ---------- the region overlay of one view ---------- */
 
   function regionLayer(v, urls) {
     const ov = document.createElement("img");
     ov.className = "dn-region"; ov.alt = ""; ov.hidden = true; ov.draggable = false;
     v.el.appendChild(ov);
-    let box = null, objUrl = null, timer = null, seq = 0;
+    let box = null, objUrl = null, timer = null, seq = 0, ready = false, stale = false;   // `ready`: the image of `box` has loaded
 
-    const active = () => v.dn.on && v.id !== null && v.st.z > 1.0001 && v.fullFor !== v.id;
-    const hide = () => { ov.hidden = true; };
+    const active = () => v.dn.on && v.id !== null && v.st.z > 1.0001 && (v.fullFor !== v.id || v.fullStale);
+    const hide = () => { ov.hidden = true; ov.classList.remove("shown"); };
     function place() {
-      if (!box || !active()) { hide(); return; }
+      if (!box || !active() || !ready) { hide(); return; }
       const f = v.frame();
       ov.style.left = f.x + box[0] * f.w + "px";
       ov.style.top = f.y + box[1] * f.h + "px";
       ov.style.width = (box[2] - box[0]) * f.w + "px";
       ov.style.height = (box[3] - box[1]) * f.h + "px";
-      ov.hidden = false;
+      if (ov.hidden) {   // appears with a short fade: never a hard patchwork edge
+        ov.hidden = false;
+        void ov.offsetWidth;
+      }
+      ov.classList.add("shown");
     }
     function visible() {   // the visible part of the image, as fractions 0..1
       const G = v.geo();
@@ -69,15 +84,22 @@
         const hdr = r.headers.get("X-Region"), sz = r.headers.get("X-Image-Size");
         const blob = await r.blob();
         if (seq !== mine || v.id !== id || v.dn.gen !== gen || !v.dn.on) return false;
+        let nb = b;
         if (hdr && sz) {
           const [x0, y0, x1, y1] = hdr.split(",").map(Number), [iw, ih] = sz.split(",").map(Number);
-          box = [x0 / iw, y0 / ih, x1 / iw, y1 / ih];
-        } else box = b;
+          nb = [x0 / iw, y0 / ih, x1 / iw, y1 / ih];
+        }
         const be = r.headers.get("X-Denoise-Backend");
         if (be) v.dn.backend = be;
         const u = URL.createObjectURL(blob);
-        ov.onload = () => { place(); if (objUrl && objUrl !== u) URL.revokeObjectURL(objUrl); objUrl = u; };
-        ov.src = u;
+        await new Promise((res) => {
+          ov.onload = ov.onerror = res;
+          ov.src = u;
+        });
+        if (seq !== mine || v.id !== id || v.dn.gen !== gen || !v.dn.on) { URL.revokeObjectURL(u); return false; }
+        if (objUrl && objUrl !== u) URL.revokeObjectURL(objUrl);
+        objUrl = u; box = nb; ready = true; stale = false;
+        place();
         return true;
       } catch (e) { return false; } finally { if (v.dn.gen === gen) v.dnBusy(-1); }
     }
@@ -85,10 +107,10 @@
       if (!active()) { hide(); return; }
       if (!v.dims) { await v.ensureDims(); if (!active()) return; }
       const w = visible();
-      if (covers(box, w)) { place(); return; }
+      if (!stale && covers(box, w)) { place(); return; }
       const mine = ++seq;
       const c = centreWindow(w);
-      if (!covers(box, c) && c !== w) { if (!(await fetchBox(c, mine)) || seq !== mine) return; }
+      if ((stale || !covers(box, c)) && c !== w) { if (!(await fetchBox(c, mine)) || seq !== mine) return; }
       if (seq === mine) await fetchBox(w, mine);
     }
     const ZL = () => ShotZoom.denoiseLevel();
@@ -98,11 +120,12 @@
       if (active()) timer = setTimeout(update, REGION_DELAY); else hide();
     });
     v.onDenoise(() => {
-      if (!v.dn.on) { box = null; hide(); seq++; }
+      if (!v.dn.on) { box = null; ready = false; hide(); seq++; }
       else if (!active()) hide();
     });
     return {
-      clear() { box = null; seq++; hide(); },
+      clear() { box = null; ready = false; stale = false; seq++; hide(); },
+      restale() { stale = true; seq++; },   // the strength changed: the old overlay stays until the new one is loaded
       refresh() { if (active()) update(); },
     };
   }
@@ -198,7 +221,7 @@
       } catch (e) { /* offline: stays Basic */ }
       await loadStatus(true);
       await buildMenu();
-      views().forEach((v) => v.reloadDenoise());
+      views().forEach((v) => v.reloadDenoise(false));
     }
     more.addEventListener("click", async (e) => {
       e.stopPropagation();
@@ -211,13 +234,17 @@
     host.addEventListener("keydown", (e) => { if (e.key === "Escape" && !menu.hidden) { closeMenu(); e.stopPropagation(); e.preventDefault(); } }, true);
 
     ShotZoom.onDenoiseLevel(() => {
-      for (const v of views()) { const l = layers.get(v); if (l) l.clear(); v.reloadDenoise(); }
+      for (const v of views()) { const l = layers.get(v); if (l) l.restale(); v.reloadDenoise(true); if (l) l.refresh(); }
       refresh();
     });
+    const overlay = host.closest("[id^=overlay-]");
+    if (overlay && window.MutationObserver) {
+      new MutationObserver(() => { if (!overlay.hidden) warm(); }).observe(overlay, { attributes: true, attributeFilter: ["hidden"] });
+    }
     loadStatus().then(refresh);
     refresh();
     return { toggle, refresh };
   }
 
-  window.ShotDenoise = { attach };
+  window.ShotDenoise = { attach, warm };
 })();

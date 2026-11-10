@@ -72,7 +72,7 @@
   function view(g, opts) {
     const el = opts.view, img = opts.img;
     const v = {
-      group: g, el, img, id: null, st: { z: 1, ux: 0.5, uy: 0.5 }, dims: null, fullFor: null,
+      group: g, el, img, id: null, st: { z: 1, ux: 0.5, uy: 0.5 }, dims: null, fullFor: null, fullStale: false,
       loading: false, pt: null, timer: null, loader: null, gen: 0,
       // denoise (T23f): on = show denoised pixels; state = off | loading | ai | basic
       dn: { on: false, state: "off", busy: 0, gen: 0, backend: "ai" }, dnLoader: null, dnListeners: [],
@@ -245,13 +245,14 @@
       clearTimeout(v.timer);
       if (v.loader) { v.loader.onload = v.loader.onerror = null; v.loader.src = ""; v.loader = null; }
       setLoading(false);
-      if (id === null) { img.removeAttribute("src"); v.fullFor = null; v.render(); return; }
+      if (id === null) { img.removeAttribute("src"); v.fullFor = null; v.fullStale = false; v.render(); return; }
       const pv = opts.urls.preview(id, el), cur = img.getAttribute("src");
       const pvd = v.dn.on && opts.urls.denoise ? opts.urls.denoise(id, el, dnLevel) : null;
       const shown = same && (cur === pvd || v.fullFor === id);   // already showing the right picture
       if (!same || (cur !== pv && !shown)) {
         img.src = pv;
         v.fullFor = null;
+        v.fullStale = false;
       }
       if (!same) {   // this photo's own zoom and position (Fit when never zoomed); linked: the first view leads
         const m = g.linked && g.views[0] !== v && g.views[0].id !== null ? g.views[0].st : v.memo.get(id);
@@ -295,12 +296,25 @@
       ld.onerror = () => { done(); };
       ld.src = opts.urls.denoise(id, el, dnLevel);
     };
-    const dnRestart = function () {
+    /* `keep` (the strength changed): the denoised picture on screen stays until the new one has
+       loaded, so changing the strength never flashes the noisy original. Switching D on/off or a
+       new image still starts from the plain picture. */
+    const dnRestart = function (keep) {
       clearTimeout(v.timer);
       if (v.loader) { v.loader.onload = v.loader.onerror = null; v.loader.src = ""; v.loader = null; }
       setLoading(false);
       v.dnReset();
+      const shownDn = (img.getAttribute("src") || "").includes("/api/denoise/");
+      if (keep && v.id !== null && shownDn) {
+        if (v.fullFor === v.id) v.fullStale = true;     // the old-strength full image stays until the new one loads
+        else { v.fullFor = null; v.fullStale = false; }
+        if (v.fullFor !== v.id) v.dnLoadPreview();
+        v.render();
+        if (v.st.z > 1.0001) v.wantFull();
+        return;
+      }
       v.fullFor = null;
+      v.fullStale = false;
       if (v.id !== null) {
         img.src = opts.urls.preview(v.id, el);   // the plain picture at once; the denoised one swaps in
         if (v.dn.on) v.dnLoadPreview();
@@ -314,7 +328,7 @@
       v.dn.on = on;
       dnRestart();
     };
-    v.reloadDenoise = function () { if (v.dn.on) dnRestart(); };   // the strength changed
+    v.reloadDenoise = function (keep) { if (v.dn.on) dnRestart(!!keep); };   // the strength changed
 
     function setLoading(on) {
       v.loading = on;
@@ -322,12 +336,12 @@
       g.refreshBars();
     }
     v.wantFull = function () {
-      if (v.id === null || v.st.z <= 1.0001 || v.fullFor === v.id) return;
+      if (v.id === null || v.st.z <= 1.0001 || (v.fullFor === v.id && !v.fullStale)) return;
       if (!v.dims) v.ensureDims();
       clearTimeout(v.timer);
       const id = v.id, gen = v.gen;
       v.timer = setTimeout(() => {
-        if (v.id !== id || v.gen !== gen || v.st.z <= 1.0001 || v.fullFor === id) return;
+        if (v.id !== id || v.gen !== gen || v.st.z <= 1.0001 || (v.fullFor === id && !v.fullStale)) return;
         if (v.loader) return;
         setLoading(true);
         const ld = new Image();
@@ -341,6 +355,7 @@
           v.dims = dimCache.get(dk(id));
           img.src = ld.src;
           v.fullFor = id;
+          v.fullStale = false;
           v.render();
         };
         ld.onerror = () => { if (v.loader === ld) { v.loader = null; setLoading(false); } };

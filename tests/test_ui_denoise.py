@@ -148,6 +148,61 @@ def test_region_overlay_is_placed_over_the_picture(ui):
     assert r[0] > 100 and r[1] > 100  # a real region of the zoomed picture, laid over it
 
 
+def test_region_overlay_fades_in_and_is_shown_only_once_loaded(ui):
+    open_loupe(ui)
+    ui.key("d")
+    wait_state(ui, "ai|basic")
+    ui.key("z")
+    ui.page.wait_for_selector("#lz-view img.dn-region.shown:not([hidden])", timeout=90000)
+    assert ui.page.evaluate("getComputedStyle(document.querySelector('#lz-view img.dn-region')).transitionDuration") == "0.15s"
+    # an overlay is never shown before its picture has loaded (no empty / half-decoded box)
+    assert ui.page.evaluate("(() => { const o = document.querySelector('#lz-view img.dn-region'); return o.complete && o.naturalWidth > 0; })()")
+
+
+def test_changing_the_strength_never_flashes_the_noisy_original(ui):
+    open_loupe(ui)
+    ui.key("d")
+    wait_state(ui, "ai|basic")
+    wait_src(ui, "/api/denoise/")
+    ui.page.evaluate("""() => { window.__srcs = []; const i = document.getElementById('big');
+        new MutationObserver(() => window.__srcs.push(i.getAttribute('src'))).observe(i, { attributes: true, attributeFilter: ['src'] }); }""")
+    ui.page.click("#lz-denoise .dn-more")
+    ui.page.wait_for_selector("#lz-denoise .dn-menu:not([hidden])")
+    ui.page.click("#lz-denoise .dn-menu [data-level=high]")
+    wait_src(ui, "level=high")
+    wait_state(ui, "ai|basic")
+    seen = ui.page.evaluate("window.__srcs")
+    assert seen and all("/api/denoise/" in u for u in seen), seen  # the previous denoised picture stayed until the new one swapped in
+    assert ui.page.evaluate("document.getElementById('big').naturalWidth") > 0
+    ui.page.evaluate("localStorage.removeItem('shotsieve.denoiseLevel')")
+
+
+def test_changing_the_strength_zoomed_keeps_the_denoised_picture(ui):
+    open_loupe(ui)
+    ui.key("d")
+    wait_state(ui, "ai|basic")
+    ui.key("z")
+    ui.page.wait_for_selector("#lz-view img.dn-region.shown:not([hidden])", timeout=90000)
+    ui.page.click("#lz-denoise .dn-more")
+    ui.page.wait_for_selector("#lz-denoise .dn-menu:not([hidden])")
+    ui.page.click("#lz-denoise .dn-menu [data-level=low]")
+    assert "/api/denoise/" in src(ui)  # still a denoised picture right after the click
+    assert ui.page.is_visible("#lz-view img.dn-region")  # and the old overlay stays until the new one is ready
+    ui.page.wait_for_function("document.querySelector('#lz-denoise').dataset.level === 'low'")
+    wait_state(ui, "ai|basic", timeout=120000)
+    ui.page.evaluate("localStorage.removeItem('shotsieve.denoiseLevel')")
+
+
+def test_opening_the_loupe_warms_the_model(browser, srv):
+    ctx = browser.new_context(viewport={"width": 1500, "height": 900})
+    try:
+        u = Ui(ctx.new_page(), srv).open()
+        with u.page.expect_request(lambda r: r.method == "POST" and "/api/denoise/warm" in r.url, timeout=15000):
+            open_loupe(u)
+    finally:
+        ctx.close()
+
+
 def test_compare_denoises_both_sides_and_shift_d_one_side(ui):
     ui.select("b.jpg")
     ui.key("c")

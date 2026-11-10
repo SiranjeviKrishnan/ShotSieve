@@ -472,6 +472,8 @@ html.native .browser-only { display: none !important; }
 .dn-info { padding: 4px 8px; color: var(--muted); font-size: 12px; max-width: 260px; white-space: normal; }
 .dn-info .dn-get { margin-top: 4px; }
 .zview > img.dn-region { inset: auto; width: auto; height: auto; object-fit: fill; transform: none; z-index: 1; pointer-events: none; image-rendering: auto; }
+.zview > img.dn-region { opacity: 0; transition: opacity 150ms ease-out; }
+.zview > img.dn-region.shown { opacity: 1; }
 .zview > img.dn-region[hidden] { display: none; }
 #lz { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 10px 14px 34px; gap: 8px; }
 #lz[hidden] { display: none; }

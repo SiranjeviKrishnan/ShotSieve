@@ -130,9 +130,10 @@ function viewBox(el) {
 const previewUrl = (id, el) => `/api/preview/${id}${q({ ...viewBox(el), folder: S.folder })}`;
 const fullUrl = (id) => `/api/full/${id}${q({ folder: S.folder })}`;
 const fullSizeUrl = (id) => `/api/full/${id}/size${q({ folder: S.folder })}`;
-const denoiseUrl = (id, el, level) => `/api/denoise/${id}${q({ level, ...viewBox(el), folder: S.folder })}`;
-const denoiseFullUrl = (id, level) => `/api/denoise/${id}/full${q({ level, folder: S.folder })}`;
-const denoiseRegionUrl = (id, level, b) => `/api/denoise/${id}/region${q({ level, x0: b[0].toFixed(5), y0: b[1].toFixed(5), x1: b[2].toFixed(5), y1: b[3].toFixed(5), folder: S.folder })}`;
+const DN_V = 2;   // the denoise engine version: a new look is a new URL (the browser caches these as immutable)
+const denoiseUrl = (id, el, level) => `/api/denoise/${id}${q({ level, dv: DN_V, ...viewBox(el), folder: S.folder })}`;
+const denoiseFullUrl = (id, level) => `/api/denoise/${id}/full${q({ level, dv: DN_V, folder: S.folder })}`;
+const denoiseRegionUrl = (id, level, b) => `/api/denoise/${id}/region${q({ level, dv: DN_V, x0: b[0].toFixed(5), y0: b[1].toFixed(5), x1: b[2].toFixed(5), y1: b[3].toFixed(5), folder: S.folder })}`;
 const zoomUrls = { preview: previewUrl, full: fullUrl, size: fullSizeUrl, denoise: denoiseUrl, denoiseFull: denoiseFullUrl, denoiseRegion: denoiseRegionUrl };
 
 /* ---------- data ---------- */

@@ -42,6 +42,28 @@ def _psnr(a: np.ndarray, b: np.ndarray) -> float:
     return float(10 * np.log10(255**2 / np.mean((a.astype(np.float64) - b.astype(np.float64)) ** 2)))
 
 
+def _ssim(a: np.ndarray, b: np.ndarray) -> float:
+    a = cv2.cvtColor(a, cv2.COLOR_RGB2GRAY).astype(np.float64)
+    b = cv2.cvtColor(b, cv2.COLOR_RGB2GRAY).astype(np.float64)
+    g = lambda x: cv2.GaussianBlur(x, (11, 11), 1.5)  # noqa: E731
+    ma, mb = g(a), g(b)
+    saa, sbb, sab = g(a * a) - ma * ma, g(b * b) - mb * mb, g(a * b) - ma * mb
+    c1, c2 = 6.5025, 58.5225
+    return float((((2 * ma * mb + c1) * (2 * sab + c2)) / ((ma * ma + mb * mb + c1) * (saa + sbb + c2))).mean())
+
+
+def _realistic_noise(clean: np.ndarray, peak: float, read: float, seed: int = 0) -> np.ndarray:
+    """Poisson-Gaussian noise in linear light, demosaic-like correlation (blur 0.7 px), gamma 2.2,
+    JPEG q90: the noise of a high-ISO camera file, not white Gaussian noise."""
+    rng = np.random.default_rng(seed)
+    lin = (clean.astype(np.float32) / 255) ** 2.2
+    n = rng.poisson(lin * peak).astype(np.float32) / peak + rng.normal(0, read, lin.shape).astype(np.float32)
+    n = cv2.GaussianBlur(n, (0, 0), 0.7)
+    out = np.clip(np.clip(n, 0, 1) ** (1 / 2.2) * 255, 0, 255).astype(np.uint8)
+    _, buf = cv2.imencode(".jpg", cv2.cvtColor(out, cv2.COLOR_RGB2BGR), [cv2.IMWRITE_JPEG_QUALITY, 90])
+    return cv2.cvtColor(cv2.imdecode(buf, 1), cv2.COLOR_BGR2RGB)
+
+
 def _photo(gen_dir, w=1200, h=800) -> np.ndarray:
     src = cv2.cvtColor(cv2.imread(str(gen_dir / "shoot" / "landscape.jpg")), cv2.COLOR_BGR2RGB)
     return cv2.resize(src, (w, h), interpolation=cv2.INTER_AREA)
@@ -230,6 +252,163 @@ def test_changed_original_is_a_new_cache_entry(client, ids, shoot):
     os.utime(p, ns=(st.st_atime_ns, st.st_mtime_ns + 5_000_000_000))
     client.get(f"/api/denoise/{iid}", params={"w": 1280})
     assert len(list((shoot / ".shotsieve" / "denoise").glob("v_*.jpg"))) == 2
+
+
+# ---- v2: one strength for Fit / region / full, luma-chroma blend, sigma, warm-up -------------------
+
+
+def test_fit_region_and_full_use_the_same_noise_level(client, ids, shoot, monkeypatch):
+    """Fit used to measure the noise on the downscaled picture (and without the ISO): Off/Low/Medium/High
+    looked the same at Fit and strong at 100 %. All three paths now pass one per-photo sigma."""
+    seen = {}
+    real = engine.denoise
+
+    def spy(rgb, level="medium", **k):
+        seen.setdefault(k.get("_tag", len(seen)), None)
+        seen[len(seen)] = k.get("sigma")
+        return real(rgb, level, **k)
+
+    monkeypatch.setattr(engine, "denoise", spy)
+    iid = ids["noisy.jpg"]
+    assert client.get(f"/api/denoise/{iid}", params={"w": 1280, "level": "low"}).status_code == 200
+    assert client.get(f"/api/denoise/{iid}/region", params={"x0": 0.2, "y0": 0.2, "x1": 0.5, "y1": 0.5, "level": "low"}).status_code == 200
+    assert client.get(f"/api/denoise/{iid}/full", params={"level": "low"}).status_code == 200
+    sig = [v for v in seen.values() if v is not None]
+    assert len(sig) == 3 and max(sig) - min(sig) < 1e-6, sig
+    assert sig[0] > 2.0  # measured on the noisy full-resolution pixels, not 0.3-ish of the downscale
+
+
+def test_fit_output_differs_measurably_from_the_picture_and_by_level(client, ids):
+    iid = ids["noisy.jpg"]
+    plain = _img(client.get(f"/api/preview/{iid}", params={"w": 1280})).astype(float)
+    d = {lv: np.abs(_img(client.get(f"/api/denoise/{iid}", params={"w": 1280, "level": lv})).astype(float) - plain).mean()
+         for lv in ("low", "medium", "high")}  # fmt: skip
+    assert d["low"] > 1.5 and d["low"] < d["medium"] < d["high"], d
+
+
+def test_cache_names_carry_the_engine_version(client, ids, shoot):
+    iid = ids["clean.jpg"]
+    client.get(f"/api/denoise/{iid}", params={"w": 1280})
+    client.get(f"/api/denoise/{iid}/region", params={"x0": 0.1, "y0": 0.1, "x1": 0.4, "y1": 0.4})
+    names = [f.name for f in (shoot / ".shotsieve" / "denoise").glob("*.jpg")]
+    assert names and all(f"_v{engine.VERSION}_" in n for n in names) and engine.VERSION >= 2
+
+
+def test_blend_splits_luma_and_chroma():
+    rng = np.random.default_rng(0)
+    t = rng.uniform(40, 200, (64, 64, 3)).astype(np.float32)
+    y = t + rng.normal(0, 8, t.shape).astype(np.float32)
+    luma = np.array([0.299, 0.587, 0.114], np.float32)
+    same = engine.blend_luma_chroma(t, y, 0.5, 0.5)
+    assert np.allclose(same, t + 0.5 * (y - t), atol=1e-3)
+    out = engine.blend_luma_chroma(t, y, 0.0, 1.0)  # chroma fully from the model, luma untouched
+    assert np.allclose(out @ luma, t @ luma, atol=1e-2)
+    assert np.allclose(out - (out @ luma)[..., None], y - (y @ luma)[..., None], atol=1e-2)
+
+
+def test_strength_scale_is_monotonic_and_keeps_a_floor_when_noisy():
+    sig = [0.3, 1.0, 1.7, 2.5, 4.0, 6.0, 12.0]
+    sc = [engine.strength_scale(x) for x in sig]
+    assert sc == sorted(sc) and sc[0] == engine.CLEAN_FLOOR and sc[-1] == 1.0
+    assert engine.strength_scale(3.0) >= 0.5 and engine.strength_scale(4.0) > 0.5
+    for s_ in sig:  # Low < Medium < High, luma and chroma
+        a = [engine.ai_alpha(lv, s_) for lv in engine.LEVELS]
+        c = [engine.ai_chroma_alpha(lv, s_) for lv in engine.LEVELS]
+        assert a[0] < a[1] < a[2] and c[0] <= c[1] <= c[2]
+
+
+def test_noise_estimate_reads_correlated_noise_closer_than_the_pixel_scale_estimate(gen_dir):
+    clean = _photo(gen_dir, 900, 600)
+    for peak, read in ((300, 0.004), (50, 0.015)):
+        noisy = _realistic_noise(clean, peak, read)
+        true = float((noisy.astype(float) - clean).std())
+        new = engine.estimate_sigma(noisy)
+        luma = cv2.cvtColor(noisy, cv2.COLOR_RGB2GRAY).astype(np.float32)
+        pixel_scale = engine._immerkaer(luma)
+        assert new >= pixel_scale and abs(new - true) < abs(pixel_scale - true), (true, new, pixel_scale)
+        assert 0.5 * true < new < 1.3 * true
+
+
+@needs_model
+def test_chroma_noise_is_removed_at_every_level_and_luma_keeps_the_level_order(gen_dir):
+    clean = _photo(gen_dir, 600, 400)
+    rng = np.random.default_rng(3)
+    c = rng.normal(0, 14, clean.shape[:2] + (2,)).astype(np.float32)  # colour mottling only
+    c = cv2.GaussianBlur(c, (0, 0), 0.7) * 1.8
+    noisy = np.clip(clean.astype(np.float32) + np.stack([c[..., 0], -0.5 * (c[..., 0] + c[..., 1]), c[..., 1]], -1), 0, 255).astype(np.uint8)
+    luma = np.array([0.299, 0.587, 0.114], np.float32)
+
+    def chroma_res(a):
+        d = a.astype(np.float32) - clean.astype(np.float32)
+        return float((d - (d @ luma)[..., None]).std())
+
+    res, change = {}, {}
+    for lv in engine.LEVELS:
+        out, used = engine.denoise(noisy, lv, iso=6400, backend="ai")
+        assert used == "ai"
+        res[lv] = chroma_res(out)
+        change[lv] = float(np.abs((out.astype(np.float32) - noisy.astype(np.float32)) @ luma).mean())
+    engine.release()
+    assert res["low"] < 0.8 * chroma_res(noisy), (res, chroma_res(noisy))
+    assert res["low"] <= res["high"] + 0.5, res
+    assert change["low"] <= change["medium"] <= change["high"], change
+
+
+@needs_model
+def test_realistic_high_iso_noise_improves_at_every_level_and_clean_is_barely_touched(gen_dir):
+    clean = _photo(gen_dir, 700, 500)
+    for iso, (peak, read) in ((12800, (50, 0.015)), (25600, (20, 0.03))):
+        noisy = _realistic_noise(clean, peak, read)
+        outs = {lv: engine.denoise(noisy, lv, iso=iso, backend="ai")[0] for lv in engine.LEVELS}
+        base = _ssim(noisy, clean)
+        p = {lv: _ssim(o, clean) for lv, o in outs.items()}
+        assert all(v >= base + 0.02 for v in p.values()), (iso, base, p)  # SSIM: the network trades fine detail, PSNR drops at High
+        assert _psnr(outs["low"], clean) > _psnr(noisy, clean), iso
+        strength = [float(np.abs(outs[lv].astype(float) - noisy).mean()) for lv in engine.LEVELS]
+        assert strength == sorted(strength), (iso, strength)
+    out, _ = engine.denoise(clean, "medium", iso=100, backend="ai")
+    assert _psnr(out, clean) > 44
+    engine.release()
+
+
+def test_warm_endpoint(client, monkeypatch):
+    calls = []
+    monkeypatch.setattr(engine, "warm", lambda: calls.append(1) or True)
+    monkeypatch.setattr(engine, "available", lambda: False)
+    assert client.post("/api/denoise/warm").json()["warming"] is False and not calls  # no model
+    monkeypatch.setattr(engine, "available", lambda: True)
+    monkeypatch.setattr(engine, "loaded", lambda: False)
+    r = client.post("/api/denoise/warm")
+    assert r.status_code == 202 and r.json()["warming"] is True
+    for _ in range(100):
+        if calls:
+            break
+        time.sleep(0.05)
+    assert calls == [1]
+
+
+def test_warm_is_skipped_while_a_cull_runs(shoot, monkeypatch):
+    from shotsieve.server.app import AppState, Job
+
+    calls = []
+    monkeypatch.setattr(engine, "warm", lambda: calls.append(1) or True)
+    monkeypatch.setattr(engine, "available", lambda: True)
+    monkeypatch.setattr(engine, "loaded", lambda: False)
+    holder = {}
+    real_init = AppState.__init__
+
+    def init(self, *a, **k):
+        real_init(self, *a, **k)
+        holder["st"] = self
+
+    monkeypatch.setattr(AppState, "__init__", init)
+    with TestClient(create_app(Settings(), default_folder=shoot)) as c:
+        holder["st"].active = Job(id="j", folder=str(shoot), state="running")
+        r = c.post("/api/denoise/warm")
+        assert r.json() == {"warming": False, "reason": "cull running"}
+        time.sleep(0.2)
+        assert not calls
+    dsrv.release_all()
 
 
 # ---- the model is released when idle ---------------------------------------------------------

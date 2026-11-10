@@ -2,9 +2,12 @@
 
 View only: the original is never written. Denoised copies are JPEGs under
 `<shoot>/.shotsieve/denoise/` (LRU-pruned like `/api/full`), keyed by image id + source mtime +
-level + backend, so a changed original, a new strength or a freshly installed model starts clean.
+level + backend + engine VERSION (a changed blend never reuses an old result), so a changed
+original, a new strength or a freshly installed model starts clean.
 
   GET /api/denoise/status                    model installed? backend, provider, memory state
+  POST /api/denoise/warm                     load + compile the model in the background (no-op
+                                             while a cull runs or when it is not installed)
   GET /api/denoise/{id}?level&w|bw&bh        the Fit picture (the viewer bucket image) denoised
   GET /api/denoise/{id}/region?level&x0&y0&x1&y1   a viewport region of the FULL-resolution image
                                              (0..1 of the frame), denoised on the native pixels
@@ -52,6 +55,7 @@ _recent_full: deque[tuple] = deque(maxlen=2)  # the (compare) full jobs still wa
 _ARRAY: dict[str, Any] = {"key": None, "rgb": None, "t": 0.0, "timer": None}
 _SIGMA: dict[tuple, float] = {}
 _ISO: dict[tuple, int | None] = {}
+_warm_lock = threading.Lock()
 
 
 def _backend() -> str:
@@ -218,6 +222,27 @@ def register(app: FastAPI, state: Any) -> None:
             "levels": list(engine.LEVELS),
         }  # fmt: skip
 
+    @app.post("/api/denoise/warm", status_code=202)
+    def warm() -> dict[str, Any]:
+        """Warm the model (CoreML compile) in the background when the loupe opens, so the first
+        press of D is fast. Never while a cull runs; the session idle-unloads as usual."""
+        if not engine.available():
+            return {"warming": False, "reason": "no model"}
+        with state.lock:
+            if state.active is not None and state.active.state in ("queued", "running"):
+                return {"warming": False, "reason": "cull running"}
+        if engine.loaded():
+            return {"warming": False, "reason": "loaded"}
+        if _warm_lock.acquire(blocking=False):
+            def run() -> None:
+                try:
+                    engine.warm()
+                finally:
+                    _warm_lock.release()
+
+            threading.Thread(target=run, name="denoise-warm", daemon=True).start()
+        return {"warming": True}
+
     @app.get("/api/denoise/{image_id}/region")
     def region(
         image_id: int,
@@ -243,7 +268,8 @@ def register(app: FastAPI, state: Any) -> None:
         px1, py1 = min(iw, -(-px1 // g) * g), min(ih, -(-py1 // g) * g)
         be = _backend()
         dest = (f / ".shotsieve" / "denoise"
-                / f"r_{image_id}_{mtime}_{level}_{be}_{px0}_{py0}_{px1}_{py1}.jpg")  # fmt: skip
+                / f"r_{image_id}_{mtime}_v{engine.VERSION}_{level}_{be}_{px0}_{py0}_{px1}_{py1}.jpg"
+                )  # fmt: skip
         extra = {"X-Region": f"{px0},{py0},{px1},{py1}", "X-Image-Size": f"{iw},{ih}"}
         if _hit(dest):
             return _jpeg_response(dest, be, extra)
@@ -274,7 +300,8 @@ def register(app: FastAPI, state: Any) -> None:
         """The whole full-resolution image denoised (cached; a minute-scale background job)."""
         f, source, mtime, master = prep(folder, image_id)
         be = _backend()
-        dest = f / ".shotsieve" / "denoise" / f"f_{image_id}_{mtime}_{level}_{be}.jpg"
+        name = f"f_{image_id}_{mtime}_v{engine.VERSION}_{level}_{be}.jpg"
+        dest = f / ".shotsieve" / "denoise" / name
         if _hit(dest):
             return _jpeg_response(dest, be)
         key = (image_id, mtime, level)
@@ -318,15 +345,19 @@ def register(app: FastAPI, state: Any) -> None:
         if edge is None:
             return full(image_id, level, folder)
         be = _backend()
-        dest = f / ".shotsieve" / "denoise" / f"v_{image_id}_{mtime}_{level}_{be}_{edge}.jpg"
+        name = f"v_{image_id}_{mtime}_v{engine.VERSION}_{level}_{be}_{edge}.jpg"
+        dest = f / ".shotsieve" / "denoise" / name
         if _hit(dest):
             return _jpeg_response(dest, be)
 
         def work() -> tuple[bytes, str]:
+            # one noise level per photo, measured on the full-resolution pixels (a downscaled
+            # picture hides its noise): Fit, region and full all use the same strength
+            sigma = _sigma_for(_full_rgb(source, mtime), source, mtime, master)
             src = _image_file(f, image_id, edge, "v", VIEW_QUALITY)  # the picture the loupe shows
             with Image.open(src) as im:
                 rgb = np.asarray(im.convert("RGB"))
-            out, used = engine.denoise(rgb, level, iso=None, pause=_pause)
+            out, used = engine.denoise(rgb, level, sigma=sigma, pause=_pause)
             return encode_jpeg(out, VIEW_QUALITY, icc=True), used
 
         data, used = guard(work)
