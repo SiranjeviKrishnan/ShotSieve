@@ -145,8 +145,8 @@ with a delivery.
 
 1. **Open ShotSieve.** A short setup assistant walks you through your first shoot (nothing is
    downloaded: the models are inside the app).
-2. **Choose a folder** of photos (RAW, JPEG, HEIC, DNG, video optional) and press **Cull**. It
-   runs in the background; the grid fills with Keep / Review / Reject as it goes.
+2. **Choose a folder** of photos (RAW, JPEG, HEIC, DNG, video optional). The cull starts by itself (**File > Re-cull this folder**, Cmd+Shift+R, runs
+   it again). It runs in the background; the grid fills with Keep / Review / Reject as it goes.
 3. **Review.** Arrow keys to move, <kbd>P</kbd> keep, <kbd>X</kbd> reject, <kbd>Space</kbd> loupe,
    <kbd>C</kbd> compare. Ratings and labels are written to XMP sidecars next to your RAW files
    (on by default; turn it off in the app menu); import or refresh the folder in Lightroom.

@@ -8,6 +8,7 @@ const BUFFER_ROWS = 3;
 const FILTERS = ["all", "keep", "review", "reject", "audit"];
 
 const S = {
+  culling: false,   // a cull job is being polled (replaces the old Cull button's disabled flag)
   folder: "",
   dropped: new Set(), // image ids just added by drag and drop (highlighted)
   focusNames: null,   // file names of the pending drop
@@ -1035,20 +1036,28 @@ async function grabFrame(im) {
 
 async function startCull(files) {
   if (!Array.isArray(files)) files = null; // (click handlers pass an Event)
+  if (S.culling) return toast("A cull is running.");
   S.focusNames = files ? files.map((f) => f.split("/").pop()) : null;
   if (!files) S.dropped = new Set();
   const folder = $("folder").value.trim();
   if (!folder) return toast(isNative() ? "Choose a folder first." : "Enter a folder path first.");
   S.folder = folder;
   try { localStorage.setItem("shotsieve.folder", folder); } catch (e) { /* private mode */ }
+  S.culling = true; // set before the request, so a second pick during it can't start another cull
   try {
     const r = await api("/api/cull", { method: "POST", body: { folder, write_xmp: false, video: $("chk-video").checked, ...(files ? { files } : {}) } });
     pollJob(r.job_id);
-  } catch (e) { toast(e.message); }
+  } catch (e) { S.culling = false; toast(e.message); }
+}
+/* File > Re-cull this folder (Cmd+Shift+R in the app): the same incremental cull a folder pick starts. */
+function reCull() {
+  if (S.culling) return toast("A cull is running.");
+  if (!$("folder").value.trim() || !S.folder) return toast("Open a folder first.");
+  return startCull();
 }
 async function pollJob(id) {
   $("progress").hidden = false;
-  $("btn-cull").disabled = true;
+  S.culling = true;
   for (;;) {
     let j;
     try { j = await api("/api/jobs/" + id); } catch (e) { toast(e.message); break; }
@@ -1074,7 +1083,7 @@ async function pollJob(id) {
     if (j.state === "error") { toast("Cull failed: " + j.error, 9000); break; }
     await new Promise((r) => setTimeout(r, 350));
   }
-  $("btn-cull").disabled = false;
+  S.culling = false;
   setTimeout(() => { $("progress").hidden = true; }, 1200);
 }
 
@@ -1457,6 +1466,7 @@ document.addEventListener("keydown", (e) => {
     return;
   }
   if ((e.metaKey || e.ctrlKey) && !e.altKey && e.key.toLowerCase() === "o" && isNative()) { e.preventDefault(); chooseFolder(); return; }
+  if (e.metaKey && e.shiftKey && !e.ctrlKey && !e.altKey && e.key.toLowerCase() === "r" && isNative()) { e.preventDefault(); reCull(); return; }
   if (typing || e.ctrlKey || e.metaKey || e.altKey) {
     if (typing && e.key === "Enter" && e.target.id === "folder") startCull();
     return;
@@ -1492,7 +1502,6 @@ document.addEventListener("keydown", (e) => {
 
 document.querySelectorAll(".tab[data-filter]").forEach((b) => b.addEventListener("click", () => setFilter(b.dataset.filter)));
 $("btn-collapse").addEventListener("click", () => { S.collapsed = !S.collapsed; relayout(); });
-$("btn-cull").addEventListener("click", () => startCull());
 
 /* ---------- drag and drop (real paths only inside the Mac app) ---------- */
 
@@ -1512,7 +1521,7 @@ $("btn-cull").addEventListener("click", () => startCull());
   window.addEventListener("shotsieve-drop", async (e) => {
     hide();
     const plan = e.detail || {};
-    if ($("btn-cull").disabled) return toast("A cull is running.");
+    if (S.culling) return toast("A cull is running.");
     if (plan.error) return toast(plan.error, 5000);
     setFolderField(plan.folder);
     const note = (plan.notes || []).join(" ");

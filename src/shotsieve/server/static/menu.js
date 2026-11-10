@@ -15,6 +15,7 @@
   // id -> handler. Everything here already existed as a button or a key; nothing is new behaviour.
   const HANDLERS = {
     choose: () => chooseFolder(),
+    recull: () => reCull(),
     crops: () => click("chk-crops"),
     video: () => click("chk-video"),
     autoxmp: () => setAutoXmp(!xmp.auto),
@@ -115,7 +116,7 @@
 
   /* ---------- browser: the compact hamburger menu (hidden in the app) ---------- */
   const LAYOUT = [
-    ["File", [["choose", "Choose Folder…", "native"], ["lropen", "Open in Lightroom"], ["trash", "Move to Trash"], ["undotrash", "Undo Move to Trash", "", "", "undotrash"]]],
+    ["File", [["choose", "Choose Folder…", "native"], ["recull", "Re-cull this folder"], ["lropen", "Open in Lightroom"], ["trash", "Move to Trash"], ["undotrash", "Undo Move to Trash", "", "", "undotrash"]]],
     ["View", [["subject", "Subject mode", "", "subject"], ["crops", "Show crop suggestions", "", "crops"], ["chips", "Name chips on grid cells", "", "chips"], ["filterbar", "Filter bar", "", "filterbar"], ["denoise", "Denoise", "", "denoise"], ["compare", "Compare with the group"]]],
     ["Tools", [["video", "Include videos", "", "video"], ["autoxmp", "Write XMP sidecars automatically", "", "autoxmp"], ["cameras", "Cameras…"], ["people", "People…"], ["shotlist", "Shot list…"], ["edit", "Edit profile…"], ["matchref", "Colour match: set this photo as reference"],
       ["jersey", "Jersey numbers…", "", "", "jersey"], ["lrsync", "Sync with Lightroom Classic catalog…", "", "", "lrsync"],

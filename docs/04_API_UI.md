@@ -34,7 +34,7 @@ Optional `folder` query/body parameter on every endpoint after `POST /api/cull` 
 image_id = stable integer id from cull.db (`image_ids` table). Paths in requests must be validated (exist, are dirs); no path traversal on thumbs.
 
 ## Review UI (`server/static`, vanilla JS, no build)
-Layout: top bar (folder input, Cull button, progress, stats: keep/review/reject counts), left filter tabs
+Layout: top bar (folder input, progress, stats: keep/review/reject counts), left filter tabs
 (All | Keep | Review | Reject | Audit), main grid of thumbnails grouped by duplicate group (group = horizontal strip,
 best image badge ★), right panel: loupe of selected image + reasons list in plain language + score.
 Keyboard (must all work; show cheat-sheet with `?`):
@@ -161,3 +161,5 @@ not matching the ratio (> 1 px) / unknown subject 422.
 skips the download step. `POST /api/models/download` is a no-op that finishes at once in a bundle (nothing is
 fetched). Data and logs live in `~/Library/Application Support/ShotSieve` and `~/Library/Logs/ShotSieve`
 (`SHOTSIEVE_DATA_DIR` / `SHOTSIEVE_LOG_DIR` override).
+
+- T25a: the toolbar Cull button is gone. Choosing a folder (Choose Folder, Open Recent, drop, Enter in the folder box) starts the cull by itself, and the server re-decides only new/changed frames. A manual re-run is File > "Re-cull this folder" (menu id `recull`; Cmd+Shift+R in the app, mirrored in the browser hamburger menu). "A cull is running" is `S.culling` in app.js; a second start while one runs is refused with a toast.

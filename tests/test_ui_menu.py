@@ -116,7 +116,7 @@ def test_browser_hamburger_reaches_every_action(browser, server):
         p.evaluate("document.getElementById('mi-lr').hidden = false; document.getElementById('mi-jersey').hidden = false")
         p.click("#btn-hamburger")
         have = set(p.eval_on_selector_all("#hamburger-menu [data-menu]", "els => els.map(e => e.dataset.menu)"))
-        assert have >= {"autoxmp", "crops", "video", "compare", "lropen", "subject", "chips", "filterbar", "cameras", "people", "shotlist", "edit", "jersey", "lrsync", "help", "setup", "lrcard"}, have
+        assert have >= {"recull", "autoxmp", "crops", "video", "compare", "lropen", "subject", "chips", "filterbar", "cameras", "people", "shotlist", "edit", "jersey", "lrsync", "help", "setup", "lrcard"}, have
         assert "choose" not in have  # the Finder picker exists only in the app
         # toggle shows its state
         p.click('#hamburger-menu [data-menu="chips"]')

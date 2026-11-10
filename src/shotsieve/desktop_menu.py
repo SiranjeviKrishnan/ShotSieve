@@ -4,7 +4,7 @@
 Every item calls `window.shotsieveMenu(id)` in the page (static/menu.js) through evaluate_js. The ids
 are a fixed allow-list (ACTION_IDS + recent:0..9), checked here before anything reaches the page and
 JSON-encoded, never interpolated from user data. Menu items carry NO key equivalents (pywebview has no
-API for them); the page keeps handling its own keys (P, X, F, Shift+P, Shift+F, Cmd+O, Cmd+L, ?). The
+API for them); the page keeps handling its own keys (P, X, F, Shift+P, Shift+F, Cmd+O, Cmd+Shift+R, Cmd+L, ?). The
 only key the menu owns is Cmd+W on "Close Window", which the page never handled, so nothing fires twice.
 The page reports its toggle states, recent folders and which optional tools apply through
 JsApi.menu_state; the menu is rebuilt from that (check marks, optional items) on the main thread.
@@ -22,7 +22,7 @@ PY_ONLY = frozenset({"close"})  # handled here, never sent to the page
 CHECKS = ("subject", "chips", "filterbar", "denoise", "crops", "video", "autoxmp")  # ids shown with a check mark when on
 OPTIONAL = ("jersey", "lrsync", "auditdone", "undotrash")  # listed only when the page says they apply
 ACTION_IDS = frozenset({
-    "choose", "autoxmp", "crops", "video", "lropen", "subject", "chips", "filterbar", "cameras", "people", "shotlist",
+    "choose", "recull", "autoxmp", "crops", "video", "lropen", "subject", "chips", "filterbar", "cameras", "people", "shotlist",
     "edit", "matchref", "denoise", "compare", "jersey", "lrsync", "auditdone", "help", "setup", "lrcard", "trash", "undotrash",
 })
 KEY_EQUIV = {"Close Window": "w"}  # Cmd+<key>, applied natively after the bar is built
@@ -58,6 +58,7 @@ def tree(state: dict[str, Any] | None = None) -> dict[str, list[Item]]:
     recent: list[Item] = [("a", f"recent:{n}", name) for n, name in enumerate(st["recent"])]
     file_items: list[Item] = [
         ("a", "choose", "Choose Folder…"),
+        ("a", "recull", "Re-cull this folder  (Cmd+Shift+R)"),
         ("sub", "Open Recent", recent or [("off", "No recent folders")]),
         ("sep",),
         ("a", "lropen", "Open in Lightroom"),

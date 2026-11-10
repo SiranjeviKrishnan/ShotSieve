@@ -306,7 +306,7 @@ def test_layout_fits_the_native_window_sizes(browser, srv, size):
         over = pg.evaluate("({sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, sh: document.documentElement.scrollHeight, ch: document.documentElement.clientHeight, main: document.getElementById('main').getBoundingClientRect().bottom, sb: document.getElementById('statusbar').getBoundingClientRect().bottom, top: document.getElementById('topbar').getBoundingClientRect().height})")
         assert over["sw"] <= over["cw"] and over["sh"] <= over["ch"], over
         assert over["sb"] <= size[1] + 1 and over["top"] < 120, over
-        for sel in ("#btn-help", "#btn-hamburger", "#search", "#btn-cull"):  # nothing is clipped off the right edge
+        for sel in ("#btn-help", "#btn-hamburger", "#search"):  # nothing is clipped off the right edge
             b = pg.locator(sel).bounding_box()
             assert b and b["x"] + b["width"] <= size[0] + 1, (sel, b)
         ui.select("two.jpg")

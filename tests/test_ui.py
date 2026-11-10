@@ -214,7 +214,7 @@ def _photos(shoot: dict) -> list[dict]:
 # ---- cull button + progress -----------------------------------------------------------------
 
 
-def test_cull_button_shows_progress_then_grid(browser, tmp_path, gen_dir, shoot_dir, models_ready):
+def test_entering_a_folder_culls_it_without_any_button(browser, tmp_path, gen_dir, shoot_dir, models_ready):
     folder = _build_shoot(tmp_path / "raw", shoot_dir, gen_dir, False)
     srv = Server(folder)
     ctx = browser.new_context(viewport={"width": 1500, "height": 900})
@@ -224,19 +224,28 @@ def test_cull_button_shows_progress_then_grid(browser, tmp_path, gen_dir, shoot_
         page.wait_for_selector("#empty:not([hidden])")
         assert "not been culled" in page.inner_text("#empty")
         assert u.cells().count() == 0
-        page.click("#btn-cull")
+        assert page.locator("#btn-cull").count() == 0  # T25a: no Cull button; picking a folder starts the cull
+        page.focus("#folder")
+        page.keyboard.press("Enter")
         page.wait_for_selector("#progress:not([hidden])")
-        assert page.is_disabled("#btn-cull")
+        assert page.evaluate("S.culling") is True
         page.wait_for_function(
             "document.querySelector('#progress-text').textContent.includes('/')"
             " || document.querySelectorAll('.cell').length > 0"
         )
         page.wait_for_selector(".cell", timeout=120_000)
-        page.wait_for_function("document.getElementById('btn-cull').disabled === false")
+        page.wait_for_function("S.culling === false")
         n = len(srv.shoot()["images"])
         assert page.inner_text("#c-all") == str(n) and n >= 17
         keep, review, reject = (int(page.inner_text(f"#c-{k}")) for k in ("keep", "review", "reject"))
         assert keep + review + reject == n
+        # the menu's "Re-cull this folder" re-runs it (incremental: nothing changed), and is refused mid-run
+        assert page.evaluate("shotsieveMenu('recull')") is True
+        page.wait_for_function("S.culling === true")
+        assert page.evaluate("shotsieveMenu('recull')") is True
+        assert "A cull is running" in page.inner_text("#toast")
+        page.wait_for_function("S.culling === false", timeout=120_000)
+        assert "Cull finished" in page.inner_text("#toast")
         u.expect_uncullled_404()
         u.check()
     finally:

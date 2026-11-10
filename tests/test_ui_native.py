@@ -38,6 +38,7 @@ def test_choose_folder_recent_and_hidden_text_boxes(browser, tmp_path, shoot_dir
         page.wait_for_selector("#btn-choose")
         assert page.is_hidden("#folder")
         assert page.is_visible("#btn-choose") and page.is_visible("#btn-recent")
+        assert page.locator("#btn-cull").count() == 0  # T25a: the cull starts by itself
         page.click("#btn-choose")  # pick -> chip -> cull
         page.wait_for_selector(".cell", timeout=180_000)
         assert page.inner_text("#folder-chip") == "Wedding B"
@@ -51,7 +52,7 @@ def test_choose_folder_recent_and_hidden_text_boxes(browser, tmp_path, shoot_dir
         assert "Wedding B" in page.inner_text("#recent-menu")
         page.click("#recent-menu button >> nth=0")
         page.wait_for_selector("#progress:not([hidden])")
-        page.wait_for_function("!document.getElementById('btn-cull').disabled", timeout=180_000)
+        page.wait_for_function("S.culling === false", timeout=180_000)
         u.expect_uncullled_404()
         u.check()
     finally:
@@ -126,12 +127,12 @@ def test_drop_overlay_folder_and_file_list(browser, tmp_path, shoot_dir, models_
         page.wait_for_function("document.querySelectorAll('.cell').length === 3", timeout=180_000)
         page.wait_for_function("document.querySelectorAll('.cell.dropped').length === 3")  # highlighted
         # a drop while culling is ignored with a note
-        page.wait_for_function("!document.getElementById('btn-cull').disabled", timeout=60_000)
-        page.evaluate("document.getElementById('btn-cull').disabled = true")
+        page.wait_for_function("S.culling === false", timeout=60_000)
+        page.evaluate("S.culling = true")
         page.evaluate("(p) => window.shotsieveDesktop.onDrop(p)", {"folder": str(shoot), "files": None, "notes": []})
         assert "A cull is running" in page.inner_text("#toast")
         # whole folder drop culls everything
-        page.evaluate("document.getElementById('btn-cull').disabled = false")
+        page.evaluate("S.culling = false")
         page.evaluate("(p) => window.shotsieveDesktop.onDrop(p)", {"folder": str(shoot), "files": None, "notes": []})
         page.wait_for_function("document.querySelectorAll('.cell').length > 3", timeout=180_000)
         u.expect_uncullled_404()
