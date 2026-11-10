@@ -130,7 +130,7 @@ function viewBox(el) {
 const previewUrl = (id, el) => `/api/preview/${id}${q({ ...viewBox(el), folder: S.folder })}`;
 const fullUrl = (id) => `/api/full/${id}${q({ folder: S.folder })}`;
 const fullSizeUrl = (id) => `/api/full/${id}/size${q({ folder: S.folder })}`;
-const DN_V = 2;   // the denoise engine version: a new look is a new URL (the browser caches these as immutable)
+const DN_V = 3;   // the denoise engine version: a new look is a new URL (the browser caches these as immutable)
 const denoiseUrl = (id, el, level) => `/api/denoise/${id}${q({ level, dv: DN_V, ...viewBox(el), folder: S.folder })}`;
 const denoiseFullUrl = (id, level) => `/api/denoise/${id}/full${q({ level, dv: DN_V, folder: S.folder })}`;
 const denoiseRegionUrl = (id, level, b) => `/api/denoise/${id}/region${q({ level, dv: DN_V, x0: b[0].toFixed(5), y0: b[1].toFixed(5), x1: b[2].toFixed(5), y1: b[3].toFixed(5), folder: S.folder })}`;
@@ -962,7 +962,9 @@ function drawMainDenoise(busy) {
   const b = $("btn-dn-main");
   b.setAttribute("aria-pressed", String(S.dnMain));
   b.classList.toggle("on", S.dnMain);
-  b.querySelector(".dn-badge").textContent = !S.dnMain ? "Off" : busy ? "…" : (dnStatus && dnStatus.backend === "ai" ? "AI" : "Basic");
+  const be = S.dnMain && window.ShotDenoise ? window.ShotDenoise.engineFor(S.sel, () => drawMainDenoise(false)) : (dnStatus && dnStatus.backend);
+  b.dataset.engine = S.dnMain ? be : "";
+  b.querySelector(".dn-badge").textContent = !S.dnMain ? "Off" : busy ? "…" : window.ShotDenoise ? window.ShotDenoise.badgeText(be) : (be === "basic" ? "Basic" : "AI");
   b.querySelector(".dn-spin").hidden = !(S.dnMain && busy);
   $("loupe-wrap").classList.toggle("dn-on", S.dnMain);
 }

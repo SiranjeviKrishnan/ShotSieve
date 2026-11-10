@@ -20,6 +20,7 @@ from PIL import Image
 
 from shotsieve.config import Settings
 from shotsieve.models import denoise as engine
+from shotsieve.models import rawnind
 from shotsieve.pipeline.cache import Cache
 from shotsieve.server import denoise as dsrv
 from shotsieve.server.app import create_app
@@ -375,6 +376,7 @@ def test_warm_endpoint(client, monkeypatch):
     calls = []
     monkeypatch.setattr(engine, "warm", lambda: calls.append(1) or True)
     monkeypatch.setattr(engine, "available", lambda: False)
+    monkeypatch.setattr(rawnind, "available", lambda: False)
     assert client.post("/api/denoise/warm").json()["warming"] is False and not calls  # no model
     monkeypatch.setattr(engine, "available", lambda: True)
     monkeypatch.setattr(engine, "loaded", lambda: False)
@@ -394,6 +396,7 @@ def test_warm_is_skipped_while_a_cull_runs(shoot, monkeypatch):
     monkeypatch.setattr(engine, "warm", lambda: calls.append(1) or True)
     monkeypatch.setattr(engine, "available", lambda: True)
     monkeypatch.setattr(engine, "loaded", lambda: False)
+    monkeypatch.setattr(rawnind, "available", lambda: False)
     holder = {}
     real_init = AppState.__init__
 

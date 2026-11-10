@@ -107,7 +107,57 @@ CPU provider, 4 threads, arena off, lazy, idle unload 120 s (`models/idle.py`).
 No other new weights: saliency and point prompts use DINOv2-small **patch tokens** from the already installed model, in a session of its own at
 dynamic size (long edge 448, multiples of 14): `models/patch_features.py`. Crop works without YOLOX (faces + saliency + point prompts).
 
-## T23f denoise model (view only, 2026-11-09)
+## T26 RawNIND UtNet2 (Bayer RAW denoiser, bundled, 2026-11-10)
+Group `rawdenoise`, **not optional**: the primary denoiser for Bayer RAW files, in every install and in the `.dmg`; a RAW never needs a download
+(JPEG / HEIC / PNG / TIFF, X-Trans and other non-Bayer RAWs, and RAW+JPEG pairs, whose viewer picture is the JPEG, keep NAFNet below).
+**RawNIND UtNet2** (Brummer and De Vleeschouwer, UCLouvain, "Learning Joint Denoising, Demosaicing, and Compression from the Raw Natural Image Noise
+Dataset", arXiv:2501.08924), checkpoint `rawnind_denoise/DenoiserTrainingBayerToProfiledRGB_4ch_2024-02-21-bayer_ms-ssim_mgout_notrans_valeither_-4/saved_models/iter_4350000.pt`
+(31,059,270 B, sha256 `c1f7de3de24cb12f4803ee65e11cfb467e9a5b80c3cb7126746ef026106c15e0`) from the authors' Google Drive folder (linked from the
+`rawnind_jddc` README). It is a plain 4-level U-Net on the packed Bayer mosaic (4 planes R, G1, G2, B; 32..512 channels; 3x3 conv + LeakyReLU 0.2; 2x2
+max-pool / transposed conv; 1x1 conv to 12 channels + pixel shuffle): input `[1,4,512,512]` float32 (black-subtracted, 0..1, camera RGB, no white balance),
+output `[1,3,1024,1024]` linear camera RGB, demosaiced and denoised, with an arbitrary output level (the engine matches it to the input's mean).
+
+**Licence.** The authors' code (`rawnind_jddc`) is GPL-3.0; their README says "The weights are dual licensed GPL3 + CC-BY-4.0". ShotSieve uses the **CC-BY-4.0
+option** of the weights, so the app's own code stays Apache-2.0. Nothing of the authors' repository or of darktable (GPL) is copied: the network is our own
+implementation from the paper and from the checkpoint's `state_dict` names and shapes (`scripts/export_rawnind.py`, Apache-2.0); darktable's `rawdenoise-nind`
+ONNX (GPL-3 on its card) is **not** shipped and was used only as a numerical reference. Attribution (THIRD_PARTY_NOTICES.md, README, the ONNX metadata):
+"RawNIND UtNet2 weights (c) Benoit Brummer, Christophe De Vleeschouwer, CC-BY-4.0 (dual GPL-3.0 / CC-BY-4.0, CC-BY-4.0 option used); trained on RawNIND
+(CC-BY-SA-4.0, doi:10.14428/DVN/DEQCIM)". **Change made (CC-BY section 3): converted from PyTorch to ONNX** (static 512, fp32; weights unchanged).
+Licence text: `licenses/CC-BY-4.0.txt`.
+**Open question (stated neutrally, not decided here):** the training dataset RawNIND is CC-BY-SA-4.0. Whether its share-alike condition extends to a model
+trained on it is unsettled (it depends on whether weights are an "adaptation" of the dataset under CC-BY-SA, and on text-and-data-mining exceptions); the
+authors chose to license the weights CC-BY-4.0 / GPL-3.0 and we follow that choice. ShotSieve does not redistribute the dataset.
+
+**Export and check.** `scripts/export_rawnind.py --download --out models/rawnind_utnet2_bayer_512.onnx` (torch 2.2.2, opset 17, fp32) loads the checkpoint
+strictly into our network, exports, writes the licence note into the ONNX metadata and compares torch with ORT. fp32 on purpose: the network's output is
+~1e5..1e6 (a few ~1e5 on high-ISO tiles; a fp16 graph overflows at 65504). Checked against darktable's ONNX of the same checkpoint (reference only) with ORT CPU:
+**max abs diff 0.0 on random tiles at three scales and on 3 real tiles each of a 24 MP APS-C ARW and a Pentax K-x DNG**. Our file: 31,054,248 B, sha256
+`a7978fd669618d373cf7f1f72010f43776991d31f4bd9d10e83f2c0e52236c17`. CoreML (MLProgram, ComputeUnits ALL / CPUAndGPU / CPUAndNeuralEngine) vs CPU on 9 real high-ISO tiles of three 24 MP ARW files:
+relative mean error < 5e-5 and no NaN / Inf; 0.03-0.04 s per 512 tile (ALL, 1 MP of output = 0.04 s/MP), ANE only 0.19 s; CPU about 0.3 s/MP.
+
+**RawNIND: hosting (decision (b): a release asset).** `registry.py` pins `RAWNIND_RELEASE_URL` = the asset `rawnind_utnet2_bayer_512.onnx` of the GitHub release
+`models-v1` of the ShotSieve repository, with the size and sha256 above. Option (a) (CI exports it from the author's checkpoint) was rejected: it puts torch into the
+release workflow, Google Drive rate-limits anonymous downloads ("too many accesses" happened in the first hour of this work), and an ONNX re-export with another torch
+version has another sha256. The file (31,054,248 B, sha256 above) is attached to the release `models-v1` (uploaded 2026-11-10; it is not a `v*` tag, so `release.yml` never rebuilds it). A new export means a new release name (`models-v2`) and a new pin. A dev checkout that has the file in `models/` already works offline.
+Rebuild of the file: the command above with the pinned checkpoint (the script verifies its sha256).
+
+**Engine (`models/rawnind.py`).** Pack the mosaic (`raw_image_visible`, per-colour black levels, white level; RGGB / BGGR / GRBG / GBRG are shifted by <= 1 px so the pack starts on an R
+site; X-Trans, Foveon, 4-colour sensors and linear DNGs are refused: they keep NAFNet), 512 px tiles with a 32 px (= 64 output px) feathered margin blended band by band (the weights are
+separable, so a horizontal pass per band plus a vertical blend is the exact 2-D weighted blend; <= ~150 MB of accumulator on a 24 MP image), one output gain per image
+(sum(input) / sum(output) over four probe tiles, cached, shared by Fit / region / full: measured ~1e-6, +/-3 % between tiles), camera -> sRGB 3x3 matrix fitted against libraw's own
+half-size render, the BT.709 curve libraw uses, then the same per-channel `match_tone` curve `finish_demosaic` uses, fitted from the NOISY render to the picture the viewer shows without
+denoising (so the denoised view has the normal view's colours and brightness; mean colour within 4/255 per channel and luminance within 3 % on both DNG fixtures, 1.4/255 on a real
+ISO 25600 24 MP ARW file). CoreML `ALL`; every tile is checked for NaN / Inf, absurd magnitude and a fp16 flat-line at 65504, and one bad tile moves the process to the CPU provider (remembered
+for the process; `SHOTSIEVE_RAWNIND_EP=cpu` forces it). A region is rendered from the mosaic crop (rect + 32 px margin, widened to a whole real tile, never reflect-padded unless the image is
+smaller than a tile) and equals the crop of the full render (<= 1/255 with an equivariant stand-in, mean 0.4/255 on a real high-ISO tile); the displayed frame is mapped to the sensor
+through the orientation and the camera's crop (`make_frame`; a picture that does not register falls back to NAFNet).
+Strength: the render is blended into our own demosaic of the same raw (`render_base`: libraw, camera white balance, same tone curve and frame; NOT the picture shown without denoising, which a camera distortion-corrects, a measured 3.5-5 px at the corners of a 24 MP APS-C body; the denoised view can therefore differ from the Off view by a few px toward the corners) with the same luma / chroma split as NAFNet (`blend_luma_chroma`): luma `a = 0.5 / 0.8 / 1.0 x strength_scale(sigma)`, chroma at
+`ai_chroma_alpha` (full once the photo is visibly noisy). Cache key: `v{models.denoise.VERSION=3}_{level}_rawnind{rawnind.VERSION=1}`.
+Measured (M-series Mac, ORT 1.31, 24 MP ARW, ISO 3200 / 16000 / 25600): Fit cold 3.2-3.6 s (includes decoding the normal full view ~1 s), a second strength 0.25 s (re-blend of
+the cached render), the whole image cold 3.1-3.5 s, a 600x600 region 1.3 s cold / 0.05 s warm, NAFNet on the same files: Fit 5.5-5.7 s, whole image 17.5-17.6 s.
+Peak process RSS while denoising a 24 MP RAW: 1165 MB, of which the normal full view is ~510 MB, the RawNIND session +110 MB, the scene (mosaic pack + matrix fit) +230 MB and the render ~+230 MB.
+
+## T23f denoise model (view only, 2026-11-09; since T26 the engine for non-RAW files and non-Bayer RAWs, and the fallback)
 Optional group `denoise` (`shotsieve models download --extra denoise`; Setup assistant / the loupe's strength menu offer it, 124 MB):
 **NAFNet-SIDD-width32** (Chen, Chu, Zhang, Sun, ECCV 2022, **MIT**; trained on SIDD real sRGB noise), as ONNX `nafnet_sidd_width32_fp16.onnx`
 123,972,868 B, sha256 `a9ca266868fad47ce1d19ae2677809e8e69a3c131afbe54ba24c431fe0dc069a` (verified by download), from

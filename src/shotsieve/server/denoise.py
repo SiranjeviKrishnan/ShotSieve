@@ -5,7 +5,15 @@ View only: the original is never written. Denoised copies are JPEGs under
 level + backend + engine VERSION (a changed blend never reuses an old result), so a changed
 original, a new strength or a freshly installed model starts clean.
 
-  GET /api/denoise/status                    model installed? backend, provider, memory state
+Two engines (T26): a Bayer RAW file goes through RawNIND UtNet2 on the raw mosaic
+(`models.rawnind`, bundled with the app, never a download); every other file (JPEG / HEIC / PNG /
+TIFF, X-Trans and other non-Bayer RAWs, a RAW+JPEG pair, whose picture is the JPEG) goes through
+NAFNet (optional model group `denoise`) or the OpenCV fallback. The engine is chosen per image
+(`_engine_for`); its id is in every cache file name and in the `X-Denoise-Backend` header
+("rawnind" | "ai" | "basic").
+
+  GET /api/denoise/status[?image_id&folder]  model installed? backend, provider, memory state;
+                                             with an image, the engine that image gets
   POST /api/denoise/warm                     load + compile the model in the background (no-op
                                              while a cull runs or when it is not installed)
   GET /api/denoise/{id}?level&w|bw&bh        the Fit picture (the viewer bucket image) denoised
@@ -26,6 +34,7 @@ from collections import deque
 from pathlib import Path
 from typing import Any
 
+import cv2
 import numpy as np
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
@@ -36,6 +45,7 @@ from shotsieve.io.preview import PreviewError, load_full
 from shotsieve.io.viewer import VIEW_QUALITY, bucket_for, encode_jpeg
 from shotsieve.log import get_logger
 from shotsieve.models import denoise as engine
+from shotsieve.models import rawnind
 
 log = get_logger("denoise")
 
@@ -53,6 +63,15 @@ _urgent = 0  # region requests waiting / running: whole-image jobs pause for the
 _urgent_lock = threading.Lock()
 _recent_full: deque[tuple] = deque(maxlen=2)  # the (compare) full jobs still wanted
 _ARRAY: dict[str, Any] = {"key": None, "rgb": None, "t": 0.0, "timer": None}
+_DEN: dict[str, Any] = {"key": None, "rgb": None, "t": 0.0}  # the RawNIND render of the last RAW
+_BASE: dict[str, Any] = {
+    "key": None,
+    "rgb": None,
+    "t": 0.0,
+}  # its blend base: our own demosaic, same geometry
+_den_lock = threading.Lock()  # guards _DEN (short holds only: a region request takes it too)
+_base_job_lock = threading.Lock()
+_den_job_lock = threading.Lock()  # one whole-image RawNIND render at a time (held while rendering)
 _SIGMA: dict[tuple, float] = {}
 _ISO: dict[tuple, int | None] = {}
 _warm_lock = threading.Lock()
@@ -60,6 +79,81 @@ _warm_lock = threading.Lock()
 
 def _backend() -> str:
     return "ai" if engine.available() else "basic"
+
+
+def _engine_for(source: Path, mtime: int, size: tuple[int, int] | None) -> str:
+    """The engine an image gets: "rawnind" for a Bayer RAW whose displayed frame registers with the
+    sensor (`size` = displayed (w, h)), else NAFNet ("ai") or the OpenCV fallback ("basic")."""
+    if rawnind.available() and rawnind.supports(
+        source, None if size is None else (size[1], size[0]), mtime
+    ):
+        return "rawnind"
+    return _backend()
+
+
+def _token(be: str) -> str:
+    """The backend part of a cache file name: RawNIND carries its own version."""
+    return f"rawnind{rawnind.VERSION}" if be == "rawnind" else be
+
+
+def _blend_u8(off: np.ndarray, den: np.ndarray, a_luma: float, a_chroma: float) -> np.ndarray:
+    """`off` + the denoiser's change, luma part x a_luma, chroma part x a_chroma (the same split as
+    NAFNet's), in row chunks so a 24 MP image never needs full-size float arrays."""
+    out = np.empty(off.shape, np.uint8)
+    step = 256
+    for r in range(0, off.shape[0], step):
+        o = off[r : r + step].astype(np.float32)
+        d = den[r : r + step].astype(np.float32)
+        out[r : r + step] = np.clip(
+            engine.blend_luma_chroma(o, d, a_luma, a_chroma) + 0.5, 0, 255
+        ).astype(np.uint8)
+    return out
+
+
+def _raw_blend(
+    base: np.ndarray,
+    den: np.ndarray,
+    level: str,
+    sigma: float,
+    shape: tuple[int, int] | None = None,
+) -> np.ndarray:
+    """Blend the RawNIND render `den` into `base` (our own demosaic of the same raw data, the same
+    geometry; see `_base_full`), both brought to `shape` (the Fit picture's size) when given."""
+    a_l, a_c = rawnind.alphas(level, sigma)
+    if shape is not None:
+        base, den = (
+            a
+            if a.shape[:2] == shape
+            else cv2.resize(a, (shape[1], shape[0]), interpolation=cv2.INTER_AREA)
+            for a in (base, den)
+        )
+    return _blend_u8(base, den, a_l, a_c)
+
+
+def _den_full(source: Path, mtime: int, off: np.ndarray, pause=None, cancel=None) -> np.ndarray:
+    """The RawNIND render of the whole image in the frame of `off`, level independent, kept for a
+    short while so Fit, regions and the full image of one viewing session share one model run."""
+    key = (str(source), mtime)
+
+    def cached() -> np.ndarray | None:
+        with _den_lock:
+            if _DEN["key"] == key and _DEN["rgb"] is not None:
+                _DEN["t"] = time.monotonic()
+                return _DEN["rgb"]
+        return None
+
+    if (hit := cached()) is not None:
+        return hit
+    # The render runs OUTSIDE `_den_lock`: it pauses for waiting region requests (`pause`), and a
+    # region request reads `_DEN` under that lock, so holding it here would deadlock the two.
+    with _den_job_lock:
+        if (hit := cached()) is not None:
+            return hit
+        den = rawnind.render(source, off, mtime=mtime, pause=pause, cancel=cancel)
+        with _den_lock:
+            _DEN.update(key=key, rgb=den, t=time.monotonic())
+        _arm_release()
+        return den
 
 
 def _pause() -> None:
@@ -95,6 +189,25 @@ def prefetch(source: Path, mtime: int) -> None:
     threading.Thread(target=run, name="denoise-prefetch", daemon=True).start()
 
 
+def _base_full(source: Path, mtime: int, off: np.ndarray) -> np.ndarray:
+    """The blend base of a RAW (`rawnind.render_base`): our own demosaic in the geometry of the
+    RawNIND render, never the distortion-corrected picture the viewer shows without denoising."""
+    key = (str(source), mtime)
+    with _den_lock:
+        if _BASE["key"] == key and _BASE["rgb"] is not None:
+            _BASE["t"] = time.monotonic()
+            return _BASE["rgb"]
+    with _base_job_lock:
+        with _den_lock:
+            if _BASE["key"] == key and _BASE["rgb"] is not None:
+                return _BASE["rgb"]
+        base = rawnind.render_base(source, off, mtime=mtime)
+        with _den_lock:
+            _BASE.update(key=key, rgb=base, t=time.monotonic())
+        _arm_release()
+        return base
+
+
 def _arm_release() -> None:
     if _ARRAY["timer"] is not None:
         _ARRAY["timer"].cancel()
@@ -110,6 +223,20 @@ def _release_array() -> None:
             _arm_release()
             return
         _ARRAY.update(key=None, rgb=None, timer=None)
+    with _den_lock:
+        recent = max(_DEN["t"], _BASE["t"])
+        if (_DEN["rgb"] is not None or _BASE["rgb"] is not None) and (
+            time.monotonic() - recent < ARRAY_KEEP_S - 0.5
+        ):
+            keep = True  # the RawNIND render of the last RAW is still in use: look again later
+        else:
+            keep = False
+            _DEN.update(key=None, rgb=None)
+        _BASE.update(key=None, rgb=None)
+    if keep:
+        _arm_release()
+        return
+    rawnind.release_scene()
     from shotsieve.models.idle import _trim
 
     _trim()
@@ -121,7 +248,11 @@ def release_all() -> None:
         if _ARRAY["timer"] is not None:
             _ARRAY["timer"].cancel()
         _ARRAY.update(key=None, rgb=None, timer=None)
+    with _den_lock:
+        _DEN.update(key=None, rgb=None)
+        _BASE.update(key=None, rgb=None)
     engine.release()
+    rawnind.release()
 
 
 def _iso_of(master: str, mtime: int) -> int | None:
@@ -211,37 +342,63 @@ def register(app: FastAPI, state: Any) -> None:
             raise HTTPException(422, f"cannot denoise: {exc}") from exc
 
     @app.get("/api/denoise/status")
-    def status() -> dict[str, Any]:
+    def status(image_id: int | None = None, folder: str | None = None) -> dict[str, Any]:
         from shotsieve.models.registry import MODEL_SPECS
 
-        spec = MODEL_SPECS["nafnet_sidd"]
-        return {
+        spec, raw = MODEL_SPECS["nafnet_sidd"], MODEL_SPECS["rawnind_utnet2"]
+        out: dict[str, Any] = {
             "model": {"name": spec.name, "installed": engine.available(), "bytes": spec.size,
                       "license": spec.license, "group": spec.group},
-            "backend": _backend(), "loaded": engine.loaded(),
+            "raw_model": {"name": raw.name, "installed": rawnind.available(), "bytes": raw.size,
+                          "license": raw.license, "group": raw.group},
+            "backend": _backend(), "loaded": engine.loaded() or rawnind.loaded(),
             "levels": list(engine.LEVELS),
         }  # fmt: skip
+        if image_id is not None:  # the engine this image gets (the UI badge and the download offer)
+            f = validate_folder(folder, state)
+            master = _path_of(f, image_id)
+            if split_virtual(master) is not None:
+                raise HTTPException(422, "videos cannot be denoised")
+            source, mtime = _full_source(f, image_id)
+            out["engine"] = _engine_for(source, mtime, _image_size(f, image_id))
+        return out
 
     @app.post("/api/denoise/warm", status_code=202)
     def warm() -> dict[str, Any]:
         """Warm the model (CoreML compile) in the background when the loupe opens, so the first
         press of D is fast. Never while a cull runs; the session idle-unloads as usual."""
-        if not engine.available():
+        if not (engine.available() or rawnind.available()):
             return {"warming": False, "reason": "no model"}
         with state.lock:
             if state.active is not None and state.active.state in ("queued", "running"):
                 return {"warming": False, "reason": "cull running"}
-        if engine.loaded():
+        if (engine.loaded() or not engine.available()) and (
+            rawnind.loaded() or not rawnind.available()
+        ):
             return {"warming": False, "reason": "loaded"}
         if _warm_lock.acquire(blocking=False):
+
             def run() -> None:
                 try:
-                    engine.warm()
+                    if rawnind.available() and not rawnind.loaded():
+                        rawnind.warm()
+                    if engine.available() and not engine.loaded():
+                        engine.warm()
                 finally:
                     _warm_lock.release()
 
             threading.Thread(target=run, name="denoise-warm", daemon=True).start()
         return {"warming": True}
+
+    def raw_pixels(source, mtime, full, box):
+        """The RawNIND render of `box` = (x0, y0, x1, y1) (whole image: box None) in the frame of
+        `full`: sliced from the cached whole-image render when there is one, else rendered alone."""
+        key = (str(source), mtime)
+        with _den_lock:
+            den = _DEN["rgb"] if _DEN["key"] == key else None
+        if den is not None:
+            return den if box is None else den[box[1] : box[3], box[0] : box[2]]
+        return rawnind.render(source, full, box, mtime=mtime)
 
     @app.get("/api/denoise/{image_id}/region")
     def region(
@@ -266,19 +423,34 @@ def register(app: FastAPI, state: Any) -> None:
         g = REGION_SNAP  # widen to the grid
         px0, py0 = px0 // g * g, py0 // g * g
         px1, py1 = min(iw, -(-px1 // g) * g), min(ih, -(-py1 // g) * g)
-        be = _backend()
-        dest = (f / ".shotsieve" / "denoise"
-                / f"r_{image_id}_{mtime}_v{engine.VERSION}_{level}_{be}_{px0}_{py0}_{px1}_{py1}.jpg"
-                )  # fmt: skip
+        be = _engine_for(source, mtime, (iw, ih))
+
+        def dest_for(b: str) -> Path:
+            return (f / ".shotsieve" / "denoise"
+                    / f"r_{image_id}_{mtime}_v{engine.VERSION}_{level}_{_token(b)}"
+                      f"_{px0}_{py0}_{px1}_{py1}.jpg")  # fmt: skip
+
+        dest = dest_for(be)
         extra = {"X-Region": f"{px0},{py0},{px1},{py1}", "X-Image-Size": f"{iw},{ih}"}
         if _hit(dest):
             return _jpeg_response(dest, be, extra)
         with _urgent_lock:
             _urgent += 1
         try:
+
             def work() -> tuple[bytes, str]:
                 full = _full_rgb(source, mtime)
                 sigma = _sigma_for(full, source, mtime, master)
+                if be == "rawnind":
+                    try:
+                        den = raw_pixels(source, mtime, full, (px0, py0, px1, py1))
+                        base = _base_full(source, mtime, full)[py0:py1, px0:px1]
+                        res = _raw_blend(base, den, level, sigma)
+                        return encode_jpeg(res, VIEW_QUALITY, icc=False), "rawnind"
+                    except engine.Cancelled:
+                        raise
+                    except Exception as exc:  # noqa: BLE001
+                        log.warning("RawNIND failed (%s); using %s", exc, _backend())
                 ex0, ey0 = max(0, px0 - REGION_MARGIN), max(0, py0 - REGION_MARGIN)
                 ex1, ey1 = min(iw, px1 + REGION_MARGIN), min(ih, py1 + REGION_MARGIN)
                 crop = np.ascontiguousarray(full[ey0:ey1, ex0:ex1])
@@ -290,8 +462,7 @@ def register(app: FastAPI, state: Any) -> None:
         finally:
             with _urgent_lock:
                 _urgent -= 1
-        if used != be:  # the model failed at run time: file it under what really made it
-            dest = dest.with_name(dest.name.replace(f"_{be}_", f"_{used}_"))
+        dest = dest_for(used)  # the model failed at run time: file it under what really made it
         _write(dest, data)
         return _jpeg_response(dest, used, extra)
 
@@ -299,9 +470,13 @@ def register(app: FastAPI, state: Any) -> None:
     def full(image_id: int, level: str = _LEVEL_Q, folder: str | None = None) -> FileResponse:
         """The whole full-resolution image denoised (cached; a minute-scale background job)."""
         f, source, mtime, master = prep(folder, image_id)
-        be = _backend()
-        name = f"f_{image_id}_{mtime}_v{engine.VERSION}_{level}_{be}.jpg"
-        dest = f / ".shotsieve" / "denoise" / name
+        be = _engine_for(source, mtime, _image_size(f, image_id))
+
+        def dest_for(b: str) -> Path:
+            name = f"f_{image_id}_{mtime}_v{engine.VERSION}_{level}_{_token(b)}.jpg"
+            return f / ".shotsieve" / "denoise" / name
+
+        dest = dest_for(be)
         if _hit(dest):
             return _jpeg_response(dest, be)
         key = (image_id, mtime, level)
@@ -314,14 +489,25 @@ def register(app: FastAPI, state: Any) -> None:
             def work() -> tuple[bytes, str]:
                 rgb = _full_rgb(source, mtime)
                 sigma = _sigma_for(rgb, source, mtime, master)
+                if be == "rawnind":
+                    try:
+                        den = _den_full(
+                            source, mtime, rgb, pause=_pause, cancel=lambda: key not in _recent_full
+                        )
+                        base = _base_full(source, mtime, rgb)
+                        res = _raw_blend(base, den, level, sigma)
+                        return encode_jpeg(res, VIEW_QUALITY, icc=True), "rawnind"
+                    except engine.Cancelled:
+                        raise
+                    except Exception as exc:  # noqa: BLE001
+                        log.warning("RawNIND failed (%s); using %s", exc, _backend())
                 out, used = engine.denoise(
                     rgb, level, sigma=sigma, pause=_pause, cancel=lambda: key not in _recent_full
                 )
                 return encode_jpeg(out, VIEW_QUALITY, icc=True), used
 
             data, used = guard(work)
-            if used != be:
-                dest = dest.with_name(dest.name.replace(f"_{be}.", f"_{used}."))
+            dest = dest_for(used)
             _write(dest, data)
         return _jpeg_response(dest, used)
 
@@ -338,31 +524,44 @@ def register(app: FastAPI, state: Any) -> None:
         this is the whole full-resolution image (same as /full)."""
         f, source, mtime, master = prep(folder, image_id)
         prefetch(source, mtime)  # the zoomed-in regions will need the full-resolution pixels
+        iw, ih = _image_size(f, image_id)
         if w is None and bw and bh:
-            iw, ih = _image_size(f, image_id)
             w = round(max(iw, ih) * min(1.0, bw / iw, bh / ih))
         edge = bucket_for(w)
         if edge is None:
             return full(image_id, level, folder)
-        be = _backend()
-        name = f"v_{image_id}_{mtime}_v{engine.VERSION}_{level}_{be}_{edge}.jpg"
-        dest = f / ".shotsieve" / "denoise" / name
+        be = _engine_for(source, mtime, (iw, ih))
+
+        def dest_for(b: str) -> Path:
+            name = f"v_{image_id}_{mtime}_v{engine.VERSION}_{level}_{_token(b)}_{edge}.jpg"
+            return f / ".shotsieve" / "denoise" / name
+
+        dest = dest_for(be)
         if _hit(dest):
             return _jpeg_response(dest, be)
 
         def work() -> tuple[bytes, str]:
             # one noise level per photo, measured on the full-resolution pixels (a downscaled
             # picture hides its noise): Fit, region and full all use the same strength
-            sigma = _sigma_for(_full_rgb(source, mtime), source, mtime, master)
+            full_rgb = _full_rgb(source, mtime)
+            sigma = _sigma_for(full_rgb, source, mtime, master)
             src = _image_file(f, image_id, edge, "v", VIEW_QUALITY)  # the picture the loupe shows
             with Image.open(src) as im:
                 rgb = np.asarray(im.convert("RGB"))
+            if be == "rawnind":
+                try:
+                    den = _den_full(source, mtime, full_rgb, pause=_pause)
+                    base = _base_full(source, mtime, full_rgb)
+                    res = _raw_blend(base, den, level, sigma, rgb.shape[:2])
+                    return encode_jpeg(res, VIEW_QUALITY, icc=True), "rawnind"
+                except engine.Cancelled:
+                    raise
+                except Exception as exc:  # noqa: BLE001
+                    log.warning("RawNIND failed (%s); using %s", exc, _backend())
             out, used = engine.denoise(rgb, level, sigma=sigma, pause=_pause)
             return encode_jpeg(out, VIEW_QUALITY, icc=True), used
 
         data, used = guard(work)
-        if used != be:
-            dest = dest.with_name(dest.name.replace(f"_{be}_", f"_{used}_"))
+        dest = dest_for(used)
         _write(dest, data)
         return _jpeg_response(dest, used)
-

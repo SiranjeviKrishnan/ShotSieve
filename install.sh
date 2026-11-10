@@ -108,7 +108,7 @@ SHOTSIEVE="$ROOT/.venv/bin/shotsieve"
 [ -x "$SHOTSIEVE" ] || die 1 "Libraries did not install. Run the install again."
 
 # ---- 4. core models -----------------------------------------------------------------------
-say "Getting the core models (131 MB)..."
+say "Getting the core models (162 MB)..."
 if ! "$SHOTSIEVE" models download >> "$LOG" 2>&1; then
   tail -n 6 "$LOG" >&2
   die 5 "The models could not be fetched or verified. Check your internet connection and run the install again."

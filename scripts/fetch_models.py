@@ -4,7 +4,7 @@ Each file comes from its pinned URL and is checked against the sha256 recorded i
 `src/shotsieve/models/registry.py` (a mismatch deletes the file and fails). Already-present,
 verified files are kept.
 
-    uv run python scripts/fetch_models.py             # core + search + ocr + crop + denoise
+    uv run python scripts/fetch_models.py             # every group below
     uv run python scripts/fetch_models.py --core      # just the 131 MB core group
 """
 
@@ -15,7 +15,8 @@ import sys
 
 from shotsieve.models.registry import MODEL_SPECS, ensure_models, group_names, models_dir
 
-ALL_GROUPS = ("core", "search", "ocr", "crop", "denoise")  # "search-int8" is a rejected alternative
+# "search-int8" is a rejected alternative
+ALL_GROUPS = ("core", "rawdenoise", "search", "ocr", "crop", "denoise")
 
 
 def main() -> int:

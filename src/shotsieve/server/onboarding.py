@@ -33,7 +33,7 @@ ONBOARDING_VERSION = 1
 FS_LIMIT = 500
 PICK_TIMEOUT_S = 120
 MIN_TRAIN_ROWS = 40
-DOWNLOAD_GROUPS = ("core", "search", "ocr", "crop", "denoise")
+DOWNLOAD_GROUPS = ("core", "rawdenoise", "search", "ocr", "crop", "denoise")
 HEIC_EXTS = frozenset({".heic", ".heif"})
 
 
@@ -325,6 +325,11 @@ def register(app: FastAPI, state: Any) -> None:
         job.state = "running"
         try:
             ensure_models(groups=groups, progress=cb)
+            if "core" in groups and "rawdenoise" not in groups:
+                try:  # T26: the RAW denoiser comes with the core models, but never blocks the cull
+                    ensure_models(groups=("rawdenoise",))
+                except Exception as exc:  # noqa: BLE001
+                    log.warning("RawNIND download failed (RAW denoise falls back): %s", exc)
             job.done = job.total
             job.state = "done"
         except Exception as exc:  # noqa: BLE001 - shown to the user with a Retry button

@@ -109,7 +109,8 @@ def cmd_models(args: argparse.Namespace) -> int:
                 last.update(name=ev["name"], pct=pct)
                 print(f"  {ev['name']}: {pct}% of {ev['total'] / 1e6:.0f} MB", flush=True)
 
-        paths = ensure_models(groups=("core", *extra), progress=show)
+        # T26: the RawNIND RAW denoiser ships with the core models
+        paths = ensure_models(groups=("core", "rawdenoise", *extra), progress=show)
         print_table(
             [(n, f"{p.stat().st_size:,} B", str(p)) for n, p in paths.items()],
             ["model", "size", "path"],

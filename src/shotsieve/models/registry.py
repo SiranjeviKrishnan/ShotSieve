@@ -33,7 +33,7 @@ class ModelSpec:
     sha256: str | None
     size: int
     license: str
-    group: str = "core"  # core | search | search-int8 | ocr | crop | denoise
+    group: str = "core"  # core | rawdenoise | search | search-int8 | ocr | crop | denoise
 
 
 # pinned to a commit (T18); bytes verified against the sha256 below
@@ -129,7 +129,30 @@ MODEL_SPECS["nafnet_sidd"] = ModelSpec(
     "denoise",
 )
 
+# T26 RawNIND UtNet2 (Bayer RAW denoiser, bundled with every install, not an optional download):
+# the author's checkpoint (weights (c) Benoit Brummer, Christophe De Vleeschouwer, CC-BY-4.0
+# option of their GPL-3.0 / CC-BY-4.0 dual licence) converted to a static 512 ONNX by
+# scripts/export_rawnind.py (torch 2.2.2, opset 17; checkpoint sha256 c1f7de3d...), bit-identical
+# to darktable's ONNX of the same checkpoint on real tiles. Hosted as an asset of a ShotSieve
+# GitHub release (models-v1, uploaded 2026-11-10). See docs/02_MODELS.md ("RawNIND: hosting").
+RAWNIND_RELEASE_URL = (
+    "https://github.com/SiranjeviKrishnan/ShotSieve/releases/download/models-v1/"
+    "rawnind_utnet2_bayer_512.onnx"
+)
+MODEL_SPECS["rawnind_utnet2"] = ModelSpec(
+    "rawnind_utnet2",
+    "rawnind_utnet2_bayer_512.onnx",
+    RAWNIND_RELEASE_URL,
+    None,
+    31054248,
+    "CC-BY-4.0",
+    "rawdenoise",
+)
+
 PINNED_SHA256: dict[str, str] = {
+    "rawnind_utnet2": (
+        "a7978fd669618d373cf7f1f72010f43776991d31f4bd9d10e83f2c0e52236c17"
+    ),
     "nafnet_sidd": (
         "a9ca266868fad47ce1d19ae2677809e8e69a3c131afbe54ba24c431fe0dc069a"
     ),
@@ -174,7 +197,7 @@ PINNED_SHA256: dict[str, str] = {
 # T18: every spec carries its sha256 (no "trust on first use")
 MODEL_SPECS = {n: replace(spec, sha256=PINNED_SHA256[n]) for n, spec in MODEL_SPECS.items()}
 
-GROUPS = ("core", "search", "search-int8", "ocr", "crop", "denoise")
+GROUPS = ("core", "rawdenoise", "search", "search-int8", "ocr", "crop", "denoise")
 
 
 def group_names(*groups: str) -> list[str]:

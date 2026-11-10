@@ -144,7 +144,8 @@ sign_binaries
 echo "-- models"
 MODELS_SRC="${SHOTSIEVE_MODELS_SRC:-$ROOT/models}"
 if [ ! -f "$MODELS_SRC/yolox_s_2022nov.onnx" ] || [ ! -f "$MODELS_SRC/siglip2_vision_fp32.onnx" ] \
-   || [ ! -f "$MODELS_SRC/nafnet_sidd_width32_fp16.onnx" ]; then
+   || [ ! -f "$MODELS_SRC/nafnet_sidd_width32_fp16.onnx" ] \
+   || [ ! -f "$MODELS_SRC/rawnind_utnet2_bayer_512.onnx" ]; then
   echo "   some models are missing: fetching (sha256-verified) into $MODELS_SRC"
   SHOTSIEVE_MODELS_DIR="$MODELS_SRC" PYTHONPATH="$SITE" "$PY" "$ROOT/scripts/fetch_models.py"
 fi

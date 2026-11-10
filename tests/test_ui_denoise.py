@@ -283,3 +283,83 @@ def test_d_is_not_a_global_key_outside_the_loupe(ui):
     ui.select("a.jpg")
     ui.key("d")  # grid: nothing happens, no error
     assert ui.page.is_hidden("#overlay-loupe")
+
+
+# ---- T26: RawNIND for Bayer RAW files ------------------------------------------------------------
+
+RAW_FIXTURE = "tests/fixtures/generated/raw/panasonic_lx1.dng"
+
+
+@pytest.fixture(scope="module")
+def raw_shoot(tmp_path_factory, gen_dir):
+    from pathlib import Path
+
+    from shotsieve.models import rawnind
+
+    if not rawnind.available():
+        pytest.skip("RawNIND model not present")
+    base = tmp_path_factory.mktemp("dnraw")
+    folder = base / "shoot"
+    folder.mkdir()
+    shutil.copy(Path(__file__).resolve().parents[1] / RAW_FIXTURE, folder / "r.dng")
+    Image.fromarray(_noisy_photo(gen_dir, 7)).save(folder / "j.jpg", quality=95)
+    with Cache.for_folder(folder) as c:
+        c.save_decisions([_row(folder / "r.dng", "keep", 0, True), _row(folder / "j.jpg", "keep", 1, True)])
+    # the app's model folder WITHOUT the NAFNet files: a RAW must still be denoised, a JPEG offered the download
+    models = base / "models"
+    models.mkdir()
+    for f in (Path(__file__).resolve().parents[1] / "models").iterdir():
+        if f.is_file() and not f.name.startswith("nafnet"):
+            (models / f.name).symlink_to(f)
+    return folder, models
+
+
+@pytest.fixture()
+def raw_ui(browser, raw_shoot, tmp_path):
+    folder, models = raw_shoot
+    dest = tmp_path / "shoot"
+    shutil.copytree(folder, dest)
+    s = Server(dest, env={"SHOTSIEVE_MODELS_DIR": str(models)})
+    ctx = browser.new_context(viewport={"width": 1500, "height": 900})
+    u = Ui(ctx.new_page(), s).open()
+    yield u
+    try:
+        u.check()
+    finally:
+        ctx.close()
+        s.stop()
+
+
+def test_a_raw_gets_the_ai_raw_badge_and_no_download_offer(raw_ui):
+    ui = raw_ui
+    open_loupe(ui, "r.dng")
+    ui.key("d")
+    wait_state(ui, "ai")
+    wait_src(ui, "/api/denoise/")
+    assert ui.page.inner_text("#lz-denoise .dn-badge") == "AI RAW"
+    assert ui.page.get_attribute("#lz-denoise", "data-engine") == "rawnind"
+    ui.page.click("#lz-denoise .dn-more")
+    ui.page.wait_for_selector("#lz-denoise .dn-menu:not([hidden])")
+    assert "RawNIND" in ui.page.inner_text("#lz-denoise .dn-info")
+    assert ui.page.locator("#lz-denoise .dn-get").count() == 0  # a RAW never needs the NAFNet download
+    ui.page.keyboard.press("Escape")
+
+
+def test_a_jpeg_without_nafnet_stays_basic_and_keeps_the_download_offer(raw_ui):
+    ui = raw_ui
+    open_loupe(ui, "j.jpg")
+    ui.key("d")
+    wait_state(ui, "basic")
+    assert ui.page.inner_text("#lz-denoise .dn-badge") == "Basic"
+    ui.page.click("#lz-denoise .dn-more")
+    ui.page.wait_for_selector("#lz-denoise .dn-menu:not([hidden])")
+    assert ui.page.locator("#lz-denoise .dn-get").count() == 1
+
+
+def test_the_main_view_button_says_ai_raw_for_a_raw(raw_ui):
+    ui = raw_ui
+    ui.select("r.dng")
+    ui.page.click("#btn-dn-main")
+    ui.page.wait_for_function("document.querySelector('#btn-dn-main .dn-badge').textContent === 'AI RAW'", timeout=90000)
+    ui.page.click("#btn-dn-main")
+    ui.page.wait_for_function("document.querySelector('#btn-dn-main .dn-badge').textContent === 'Off'")

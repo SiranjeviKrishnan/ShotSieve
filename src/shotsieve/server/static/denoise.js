@@ -2,7 +2,9 @@
 
    ShotDenoise.attach(group, {host, enabled})
      - builds the toolbar control in `host`: [Denoise <badge>] [v strength menu]. Badge: "Off", a spinner
-       while working, "AI" (NAFNet) or "Basic" (OpenCV fallback when the model is not installed).
+       while working, "AI RAW" (RawNIND on the raw data of a Bayer RAW file, built in), "AI" (NAFNet, for
+       everything else) or "Basic" (OpenCV fallback when the NAFNet model is not installed). The engine is
+       chosen per image by the server (GET /api/denoise/status?image_id=).
      - D toggles every view of the group (compare: both sides), Shift+D only the side under the
        pointer. The state follows across frames.
      - zoomed in, the denoised pixels of the VISIBLE region come first (/api/denoise/{id}/region, the full
@@ -17,13 +19,34 @@
   const CENTRE_PX = 1.5e6;     // the first region: a window of this many pixels around the view centre
   const REGION_DELAY = 220;    // ms of calm before a region is requested
   let status = null;           // /api/denoise/status
+  const engines = new Map();   // "folder|id" -> "rawnind" | "ai" | "basic": the engine the server picked for that image
+  const refreshers = new Set();
+  const fallbackEngine = () => (status ? status.backend : "ai");
+  /* The engine of one image. The first call answers with the global backend and asks the server; the
+     answer re-draws every badge (and `onAnswer`, for the main-view button). */
+  function engineFor(id, onAnswer) {
+    if (id === null || id === undefined) return fallbackEngine();
+    const folder = typeof S !== "undefined" && S.folder ? S.folder : "";
+    const k = folder + "|" + id;
+    if (engines.has(k)) return engines.get(k) || fallbackEngine();
+    engines.set(k, null);
+    const qs = "image_id=" + id + (folder ? "&folder=" + encodeURIComponent(folder) : "");
+    fetch("/api/denoise/status?" + qs).then((r) => (r.ok ? r.json() : null)).then((j) => {
+      if (!j || !j.engine) { engines.delete(k); return; }
+      engines.set(k, j.engine);
+      if (onAnswer) onAnswer(j.engine);
+      refreshers.forEach((f) => f());
+    }).catch(() => engines.delete(k));
+    return fallbackEngine();
+  }
+  const badgeText = (be) => (be === "basic" ? "Basic" : be === "rawnind" ? "AI RAW" : "AI");
 
   async function loadStatus(force) {
     if (status && !force) return status;
     try {
       const r = await fetch("/api/denoise/status");
-      status = r.ok ? await r.json() : { backend: "basic", model: { installed: false, bytes: 0 } };
-    } catch (e) { status = { backend: "basic", model: { installed: false, bytes: 0 } }; }
+      status = r.ok ? await r.json() : { backend: "basic", model: { installed: false, bytes: 0 }, raw_model: { installed: false } };
+    } catch (e) { status = { backend: "basic", model: { installed: false, bytes: 0 }, raw_model: { installed: false } }; }
     return status;
   }
 
@@ -34,7 +57,7 @@
     if (Date.now() - warmedAt < 20000) return;
     warmedAt = Date.now();
     loadStatus().then((st) => {
-      if (st && st.model && st.model.installed) fetch("/api/denoise/warm", { method: "POST" }).catch(() => {});
+      if (st && ((st.model && st.model.installed) || (st.raw_model && st.raw_model.installed))) fetch("/api/denoise/warm", { method: "POST" }).catch(() => {});
     });
   }
 
@@ -153,18 +176,21 @@
     function refresh() {
       const on = anyOn();
       const busy = views().some((v) => v.dn.on && v.dn.state === "loading");
-      const be = (views().find((v) => v.dn.on) || { dn: { backend: status ? status.backend : "ai" } }).dn.backend;
+      const on1 = views().find((v) => v.dn.on);
+      const be = on1 ? engineFor(on1.id) : fallbackEngine();
       btn.setAttribute("aria-pressed", String(on));
       btn.classList.toggle("on", on);
       spin.hidden = !busy;
       const per = views().length > 1 && on && !views().every((v) => v.dn.on) ? " (one side)" : "";
-      badge.textContent = !on ? "Off" : busy ? "…" : (be === "basic" ? "Basic" : "AI") + per;
-      host.dataset.state = !on ? "off" : busy ? "loading" : be;
+      badge.textContent = !on ? "Off" : busy ? "…" : badgeText(be) + per;
+      host.dataset.state = !on ? "off" : busy ? "loading" : be === "rawnind" ? "ai" : be;
+      host.dataset.engine = on ? be : "";
       host.dataset.on = on ? "1" : "0";
       host.dataset.sides = views().map((v) => (v.dn.on ? "1" : "0")).join("");
       host.dataset.level = ShotZoom.denoiseLevel();
     }
     for (const v of views()) v.onDenoise(refresh);
+    refreshers.add(refresh);
 
     async function toggle(single) {
       if (!enabled()) return;
@@ -173,7 +199,7 @@
       if (!act) return;
       const targets = single ? [act] : views();
       const on = !act.dn.on;
-      for (const v of views()) v.dn.backend = st.backend;
+      for (const v of views()) v.dn.backend = engineFor(v.id);
       for (const v of targets) {
         if (v.dn.on !== on) v.setDenoise(on);
       }
@@ -196,7 +222,10 @@
       }
       const info = document.createElement("div");
       info.className = "dn-info";
-      if (st.model.installed) info.textContent = "AI denoiser (NAFNet, MIT)";
+      const cur = group.current();
+      const eng = cur ? engineFor(cur.id) : st.backend;
+      if (eng === "rawnind") info.textContent = "AI denoiser for RAW files (RawNIND, built in; CC-BY-4.0)";
+      else if (st.model.installed) info.textContent = "AI denoiser (NAFNet, MIT)";
       else {
         info.textContent = "Basic denoiser (OpenCV). ";
         const get = document.createElement("button");
@@ -220,6 +249,7 @@
         }
       } catch (e) { /* offline: stays Basic */ }
       await loadStatus(true);
+      engines.clear();   // the server picks NAFNet now for the non-RAW files it called "basic"
       await buildMenu();
       views().forEach((v) => v.reloadDenoise(false));
     }
@@ -246,5 +276,5 @@
     return { toggle, refresh };
   }
 
-  window.ShotDenoise = { attach, warm };
+  window.ShotDenoise = { attach, warm, engineFor, badgeText };
 })();

@@ -83,7 +83,9 @@ with a delivery.
   orientation, camera, lens, warnings), keyboard-first multi-select, batch keep / reject / stars /
   labels, Move to Trash (never a hard delete, with Undo).
 - **Full-screen loupe with zoom.** 100 % and pinch zoom on the full-resolution image, a navigator
-  for panning, and an optional AI **denoise** for viewing (view only, the file never changes).
+  for panning, and an AI **denoise** for viewing (view only, the file never changes). On Bayer RAW
+  files it works on the raw data itself with RawNIND, built in and offline (badge "AI RAW"); other
+  files use NAFNet (optional download).
 - **Shot-list alerts.** Load a shot list (wedding, sports, corporate templates included) and see
   which must-have shots are covered and which are missing, before you leave the venue.
 - **Jersey numbers (opt-in).** OCR reads numbers so you can search `jersey:23`; map numbers to
@@ -213,7 +215,15 @@ build time, and all licences allow redistribution. Full details, sources and cit
 | SigLIP2-B/16 (vision fp32, text int8, tokenizer) | Natural-language search | Apache-2.0 | 689.6 MB |
 | PP-OCR det v3 + rec (English) | Jersey numbers | Apache-2.0 | 10.3 MB |
 | YOLOX-s | Subject detection for crops (Beta) | Apache-2.0 | 35.9 MB |
-| NAFNet-SIDD-width32 | Denoise for viewing | MIT | 124.0 MB |
+| RawNIND UtNet2 (Bayer) | Denoise RAW files for viewing (built in, primary) | CC-BY-4.0 | 31.1 MB |
+| NAFNet-SIDD-width32 | Denoise for viewing other files (JPEG, HEIC, PNG, TIFF, non-Bayer RAW) | MIT | 124.0 MB |
+
+RawNIND UtNet2 weights (c) Benoit Brummer, Christophe De Vleeschouwer, CC-BY-4.0 (the authors dual-license
+the weights GPL-3.0 / CC-BY-4.0; the CC-BY-4.0 option is used); trained on RawNIND (CC-BY-SA-4.0,
+doi:10.14428/DVN/DEQCIM). Source: https://github.com/trougnouf/rawnind_jddc, paper arXiv:2501.08924.
+Changes made: converted from PyTorch to ONNX (weights unchanged). No code from the authors' GPL-3.0
+repository is used. Whether the dataset's share-alike condition reaches the weights is an open question
+(see [docs/02_MODELS.md](docs/02_MODELS.md)).
 
 ## Privacy
 
